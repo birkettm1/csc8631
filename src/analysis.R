@@ -17,9 +17,9 @@ head(dfAR) #archetype responses
 head(dfE) #enrollments
 head(dfLSR) #leaving survey
 head(dfQR) #question response
-head(dfTM)
-head(dfVS)
-head(dfSS)
+head(dfTM) #team members
+head(dfVS) #video stats
+head(dfSS) #sentiment survey
 
 #enrollments
 #leaving.responses

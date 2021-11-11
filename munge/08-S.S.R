@@ -4,11 +4,15 @@
 setwd("data/")
 
 #working files
-files = list.files(pattern="*sentiment.survey.csv")
+files = list.files(pattern="*sentiment.survey.responses.csv")
 
 #bind into 1 data frame using readr https://readr.tidyverse.org/articles/readr.html
 dfSS <- lapply(files, function(i){
-  read_csv(i, show_col_types = FALSE)
+  read_csv(i, col_types=list(
+    id = col_character(),
+    week_number = col_double(),
+    experience_rating = col_double()
+  ))
 }) %>% bind_rows
 
 #working directory back to root
