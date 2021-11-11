@@ -11,8 +11,8 @@ knitr::opts_knit$set(root.dir=normalizePath('..'))
 ```
 
 ```{r ProjectTemplate}
-library(ProjectTemplate)
-load.project()
+library(ProjectTemplate);
+load.project();
 ```
 
 ## R Markdown
