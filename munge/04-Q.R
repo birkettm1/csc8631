@@ -7,9 +7,14 @@ setwd("data/")
 files = list.files(pattern="*question.response.csv")
 
 #bind into 1 data frame using readr https://readr.tidyverse.org/articles/readr.html
-dfQR <- lapply(files, function(i){
-  read_csv(i, show_col_types = FALSE)
-}) %>% bind_rows
+datalist = lapply(files, function(i){
+  csv <- read_csv(i, show_col_types = FALSE)
+  csv$stage_id <- substring(i,16,16)
+  csv
+})
+
+#collate datalist to dataframe
+dfQR <-dplyr::bind_rows(datalist)
 
 #fettle the datetimes here
 dfQR$submitted_at = as.POSIXlt(dfQR$submitted_at)
@@ -20,6 +25,8 @@ dfQR$correct = as.logical(dfQR$correct)
 dfQR %>% 
   arrange(learner_id, week_number, step_number, question_number) %>%
   mutate(id = row_number())
+
+dfQR$stage_id = as.integer(dfQR$stage_id)
 
 #working directory back to root
 setwd("..")

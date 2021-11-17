@@ -33,17 +33,27 @@ head(dfSS) #sentiment survey #pk is id
 #create a diagram of the relationships between tables
 create.erd.flowchart()
 
-#enrollments - no primary key
-dfE %>% 
-   count(learner_id) %>% 
-   filter(n > 1)
-
-dfTM %>% 
-   count(learner_id) %>% 
-   filter(n > 1)
-
 #(Visualise > Model > Transform) 
 
+#something about people - enrollments
+barplot(table(dfE$gender))
+barplot(table(dfE$age_range))
+barplot(table(dfE$country))
+barplot(table(dfE$highest_education_level))
+barplot(table(dfE$employment_area))
+barplot(table(dfE$employment_status))
+barplot(table(dfE$detected_country))
+
+#something about results - relate back to dfSA
+barplot(table(dfQR$correct))
+
+#something about leavers - relate back to dfSA
+barplot(table(dfLSR$last_completed_step))
+barplot(table(dfLSR$last_completed_step_number))
+barplot(table(dfLSR$last_completed_week_number))
+
+#some about video stats
+dfVS
 #Understand 
 
 #Communicate

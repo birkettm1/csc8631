@@ -15,7 +15,7 @@ datalist = lapply(files, function(i){
     id = col_integer()
   ))
   
-  csv$unit_id <- substring(i,16,16)
+  csv$stage_id <- substring(i,16,16)
   
   csv
 })
@@ -25,6 +25,7 @@ dfAR <-dplyr::bind_rows(datalist)
  
 #fettle the datetimes here
 dfAR$responded_at = as.POSIXlt(dfAR$responded_at)
+dfAR$stage_id = as.integer(dfAR$stage_id)
 
 #working directory back to root
 setwd("..")

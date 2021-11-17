@@ -30,12 +30,12 @@ The project has been set up using ProjectTemplate to provide some structure and 
 
 ## Libraries
 
-* Readr - library to provide extra functionality to import the data from CSV. In this case it allows me to import that data and assign type.
+* Readr - library to provide extra functionality to import the data from CSV. In this case it allows me to import the data and assign type.
 
-* r - data management.
+* Dplyr - data management.
 
 ## Relationships
-The data was investigated to reveal no primary keys, however columns such as learner_id could be used to create local relationships.The initial table structure has been envisaged as per below.
+The data was investigated to reveal no primary keys, however columns such as learner_id could be used to create local relationships. The initial table structure has been envisaged as per below.
 
 ```{r erd, echo = FALSE, fig.align='center', fig.cap = "Simple Entity Flow Diagram"}
 
@@ -43,7 +43,7 @@ The data was investigated to reveal no primary keys, however columns such as lea
  
 ```
 
-Each relation was also invesigated for potential primary keys, and those that didn't have one had one created.
+Each relation was also investigated for potential primary keys, and those that didn't have one had one created.
 
 ## Iteration 1
 Iteration 1 will be used to investigate the data and generate a hypothesis for further investigation. It will go through the entire list of sub-processes outlined above. Once a hypothesis has been identified this will be further investigated in iteration 2.

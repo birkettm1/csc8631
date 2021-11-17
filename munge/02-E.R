@@ -7,9 +7,14 @@ setwd("data/")
 files = list.files(pattern="*enrolments.csv")
 
 #bind into 1 data frame using readr https://readr.tidyverse.org/articles/readr.html
-dfE <- lapply(files, function(i){
-  read_csv(i, show_col_types = FALSE)
-}) %>% bind_rows
+datalist = lapply(files, function(i){
+  csv <- read_csv(i, show_col_types = FALSE)
+  csv$stage_id <- substring(i,16,16)
+  csv
+})
+
+#collate datalist to dataframe
+dfE <-dplyr::bind_rows(datalist)
 
 #fettle the datetimes here
 dfE$enrolled_at = as.POSIXlt(dfE$enrolled_at)
@@ -21,7 +26,9 @@ dfE$purchased_statement_at = as.POSIXlt(dfE$purchased_statement_at)
 dfE %>% 
   arrange(learner_id, enrolled_at) %>%
   mutate(id = row_number())
-  
+
+dfE$stage_id = as.integer(dfE$stage_id)
+
 #working directory back to root
 setwd("..")
 
