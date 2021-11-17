@@ -15,6 +15,9 @@ dfSS <- lapply(files, function(i){
   ))
 }) %>% bind_rows
 
+#fettle the datetimes here
+dfSS$responded_at = as.POSIXlt(dfSS$responded_at)
+
 #working directory back to root
 setwd("..")
 

@@ -12,8 +12,61 @@ knitr::opts_knit$set(root.dir=normalizePath('..'))
 
 ```{r ProjectTemplate}
 library(ProjectTemplate);
+library(dplyr);
+library(readr);
+library(rmarkdown);
 load.project();
 ```
+
+## CSC 8631 - Data Investigation with Student Data
+
+### Introduction
+
+Report into investigation of Student Data using the CRISP-DM model. This report covers two iterations of the model and includes the processes of Business Understanding, Data Understanding, Data Preparation. The subprocesses I've chosen are to do the following steps:
+
+* Import
+* Tidy
+* Visualise
+* Understand 
+* Communicate
+
+The project has been set up using ProjectTemplate to provide some structure and repeatability, which will be tested on a regular basis. Version control is provided by Git and this report created with R Markdown.
+
+## Libraries
+
+* Readr - library to provide extra functionality to import the data from CSV. In this case it allows me to import that data and assign type.
+
+* r - data management.
+
+## Iteration #1
+Iteration 1 will be used to investigate the data and generate a hypothesis for further investigation. It will go through the entire list of sub-processes outlined above. Once a hypothesis has been identified this will be further investigated in iteration 2.
+
+### #1 - Import and Tidy
+The data was imported into R using Readr into 8 data frames from the original csv files, for easier analysis, the initial data sets were split out by dataset number which resulted in too many separate data frames to investigate. This step was done using ProjectTemplate's munge functionality. Due to the fact that the detected data types were not consistent the following data manipulation was carried out. 
+
+* ID - to integer
+* Date time - to the local POSIX date time format
+* Logicals - converted to logical
+
+Initial exploration of the data indicated that Learner_Id was a candidate for relating 6 of the 8 data frames as it was a common column, the data regarding video views was video centric and did not have learner id nor did the sentiment survey data.
+
+### #2 Visualise
+
+### #3 Understand
+
+###
+## Iteration 2
+Iteration 2 will further investigate the hypothesis identified in iteration 1 and will present the findings.
+
+### Findings
+To answer the hypothesis XYZ the findings are that ABC
+
+## Conclusion
+
+## References
+ReadR - https://readr.tidyverse.org/index.html
+DiagrammeR - https://rich-iannone.github.io/DiagrammeR/
+Working with categorical data - https://cran.r-project.org/web/packages/vcdExtra/vignettes/vcd-tutorial.pdf 
 
 ## R Markdown
 

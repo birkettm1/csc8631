@@ -11,6 +11,9 @@ dfTM <- lapply(files, function(i){
   read_csv(i, show_col_types = FALSE)
 }) %>% bind_rows
 
+#set col names
+colnames(dfTM) <- c("learner_id","forename", "surname", "team_role", "user_role")
+
 #working directory back to root
 setwd("..")
 

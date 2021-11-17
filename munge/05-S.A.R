@@ -11,6 +11,10 @@ dfSA <- lapply(files, function(i){
   read_csv(i, show_col_types = FALSE)
 }) %>% bind_rows
 
+#fettle the datetimes here
+dfSA$first_visited_at = as.POSIXlt(dfSA$first_visited_at)
+dfSA$last_completed_at = as.POSIXlt(dfSA$last_completed_at)
+
 #working directory back to root
 setwd("..")
 
