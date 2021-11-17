@@ -15,6 +15,11 @@ dfSA <- lapply(files, function(i){
 dfSA$first_visited_at = as.POSIXlt(dfSA$first_visited_at)
 dfSA$last_completed_at = as.POSIXlt(dfSA$last_completed_at)
 
+#set col names
+colnames(dfSA) <- c("learner_id","step_position", "step_number", "first_visited_at", "last_completed_at")
+
+
+
 #working directory back to root
 setwd("..")
 

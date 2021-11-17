@@ -14,6 +14,11 @@ dfTM <- lapply(files, function(i){
 #set col names
 colnames(dfTM) <- c("learner_id","forename", "surname", "team_role", "user_role")
 
+#create a primary key need to add this as foreign key to other tables
+dfTM %>% 
+  arrange(learner_id) %>%
+  mutate(id = row_number())
+
 #working directory back to root
 setwd("..")
 

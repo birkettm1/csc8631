@@ -17,6 +17,11 @@ dfE$unenrolled_at = as.POSIXlt(dfE$unenrolled_at)
 dfE$fully_participated_at = as.POSIXlt(dfE$fully_participated_at)
 dfE$purchased_statement_at = as.POSIXlt(dfE$purchased_statement_at)
 
+#create a primary key need to add this as foreign key to other tables
+dfE %>% 
+  arrange(learner_id, enrolled_at) %>%
+  mutate(id = row_number())
+  
 #working directory back to root
 setwd("..")
 

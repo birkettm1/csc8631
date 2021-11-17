@@ -16,6 +16,11 @@ dfQR$submitted_at = as.POSIXlt(dfQR$submitted_at)
 dfQR$cloze_response = as.logical(dfQR$cloze_response)
 dfQR$correct = as.logical(dfQR$correct)
 
+#create a primary key need to add this as foreign key to other tables
+dfQR %>% 
+  arrange(learner_id, week_number, step_number, question_number) %>%
+  mutate(id = row_number())
+
 #working directory back to root
 setwd("..")
 

@@ -11,6 +11,11 @@ dfVS <- lapply(files, function(i){
   read_csv(i, show_col_types = FALSE)
 }) %>% bind_rows
 
+#create a primary key need to add this as foreign key to other tables
+dfVS %>% 
+  arrange(step_position, title) %>%
+  mutate(id = row_number())
+
 #working directory back to root
 setwd("..")
 
