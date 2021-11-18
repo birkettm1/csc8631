@@ -68,9 +68,15 @@ table(dfQR$step_number)
 barplot(table(dfQR$correct))
 
 #something about leavers - relate back to dfSA
+summary(dfSA)
 summary(dfLSR)
 table(dfLSR)
+leavers = left_join(dfLSR, dfSA, by = c("last_completed_step" = "step_position"), 
+          copy = FALSE, suffix = c(".dfLSR", ".dfSA"), keep = TRUE,
+          na_matched = "na")
+
 barplot(table(dfLSR$last_completed_step))
+barplot(table(dfSA$step_position))
 barplot(table(dfLSR$last_completed_step_number))
 barplot(table(dfLSR$last_completed_week_number))
 
