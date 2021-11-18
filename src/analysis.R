@@ -35,7 +35,17 @@ create.erd.flowchart()
 
 #(Visualise > Model > Transform) 
 
+#2 data sources
+plot(movies$length, movies$rating)
+#categorical
+barplot(table(categorical))
+#continuous
+hist(continuous)
+boxplot(continuous ~ categorical)
+
 #something about people - enrollments
+summary(dfE)
+table(dfE$gender)
 barplot(table(dfE$gender))
 barplot(table(dfE$age_range))
 barplot(table(dfE$country))
@@ -43,17 +53,38 @@ barplot(table(dfE$highest_education_level))
 barplot(table(dfE$employment_area))
 barplot(table(dfE$employment_status))
 barplot(table(dfE$detected_country))
+barplot(table(dfE$enrolled_at))
+barplot(table(dfE$unenrolled_at))
+plot.enrollments()
+
+
+#learned - people come from GB, India, US, NG
 
 #something about results - relate back to dfSA
+summary(dfQR)
+table(dfQR$quiz_question) 
+table(dfQR$week_number) 
+table(dfQR$step_number) 
 barplot(table(dfQR$correct))
 
 #something about leavers - relate back to dfSA
+summary(dfLSR)
+table(dfLSR)
 barplot(table(dfLSR$last_completed_step))
 barplot(table(dfLSR$last_completed_step_number))
 barplot(table(dfLSR$last_completed_week_number))
 
 #some about video stats
-dfVS
+summary(dfVS)
+barplot(table(dfVS$total_transcript_views))
+barplot(table(dfVS$viewed_five_percent))
+barplot(table(dfVS$viewed_onehundred_percent))
+
+#something about sentiment - relate back via week_number
+summary(dfSS)
+table(dfSS$reason)
+count(dfSS, reason)
+
 #Understand 
 
 #Communicate

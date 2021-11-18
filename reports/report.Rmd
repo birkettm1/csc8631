@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir=normalizePath('..'))
 ```
 
-```{r}
+```{r loadproject, include=FALSE}
 library(ProjectTemplate); load.project()
 ```
 
@@ -30,34 +30,36 @@ The project has been set up using ProjectTemplate to provide some structure and 
 
 ## Libraries
 
-* Readr - library to provide extra functionality to import the data from CSV. In this case it allows me to import the data and assign type.
-
-* Dplyr - data management.
+* ReadR - library to provide extra functionality to import the data from CSV. In this case it allows me to import the data and assign type.
+* DiagrammeR - used to create a simple entity relationship diagram to focus the initial data understanding step.
+* DplyR - library to provide easier data management.
 
 ## Relationships
 The data was investigated to reveal no primary keys, however columns such as learner_id could be used to create local relationships. The initial table structure has been envisaged as per below.
 
-```{r erd, echo = FALSE, fig.align='center', fig.cap = "Simple Entity Flow Diagram"}
+![Entity Relationship Diagram showing how to relate each dataframe together](erd.png "Entity Relationship Diagram")
 
-#create.erd.flowchart()
- 
-```
-
-Each relation was also investigated for potential primary keys, and those that didn't have one had one created.
+Each relation was also investigated for potential primary keys, and those that didn't have one had one created using the row_id
 
 ## Iteration 1
-Iteration 1 will be used to investigate the data and generate a hypothesis for further investigation. It will go through the entire list of sub-processes outlined above. Once a hypothesis has been identified this will be further investigated in iteration 2.
+Iteration 1 was be used to investigate the data and generate a hypothesis for further investigation going through the steps outlined above. Once a hypothesis has been identified this will be further investigated in iteration 2.
 
 ### 1 - Import and Tidy
-The data was imported into R using Readr into 8 data frames from the original csv files, for easier analysis, the initial data sets were split out by dataset number which resulted in too many separate data frames to investigate. This step was done using ProjectTemplate's munge functionality. Due to the fact that the detected data types were not consistent the following data manipulation was carried out. 
+The data was imported into R using Readr into 8 data frames from the original csv files, for easier analysis. The initial data sets were split out by dataset number which resulted in too many separate data frames to investigate. This step was done using ProjectTemplate's munge functionality. Due to the fact that the detected data types were not consistent the following data manipulation was carried out. 
 
 * ID - to integer
 * Date time - to the local POSIX date time format
-* Logicals - converted to logical
+
+The number of each file was added to the data frame as "stage_id"  to give an indication of which stage in the course the record was created at.
 
 Initial exploration of the data indicated that Learner_Id was a candidate for relating 6 of the 8 data frames as it was a common column, the data regarding video views was video centric and did not have learner id nor did the sentiment survey data.
 
 ### 2 Visualise
+Each data frame was investigated with a combination of viewing the data, creation of barplots and frequency tables. The data investigated was principally about Enrollments, Results, Leavers and Video Views. This was an attempt to find some interesting data to analyse, however, a lot of the investigation returned the majority of the data being unknown. For example, in the Enrollments data barplots of data items such as Country, Age Range, Employment returned the majority of the data was unknown as per below.
+
+```{r countryBoxPlot, echo=FALSE}
+  plot.enrollments()
+```
 
 ### 3 Understand
 
