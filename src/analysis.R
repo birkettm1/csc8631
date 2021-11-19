@@ -78,24 +78,30 @@ quantile(as.numeric(dfSA$timeToComplete),na.rm=TRUE) #- quantile values at 25, 5
 #last_completed_step is step
 summary(dfLSR)
 table(dfLSR)
+plot.leavers()
 
-#step
-barplot(table(dfLSR$last_completed_step))
-hist(as.numeric(substring(dfLSR$last_completed_step,1,3)))
-
-#reason
-barplot(table(dfLSR$leaving_reason), main="Leaving Reasons",
-        names.arg = c("Time", "NotSaying", "Other", "Time", "TooEasy", "TooHard", "Different", "NoHelpGoals"))
-boxplot(as.numeric(substring(dfLSR$last_completed_step,1,3)) ~ dfLSR$leaving_reason)
+#compare leaver stage to step
+plot(dfLSR$last_completed_step, dfLSR$stage_id
+     , pch=16
+     , main="Comparison of Stage ID vs Last Completed Step"
+     , xlab="Step Number"
+     , ylab="Stage Number")
 
 
 #question response
 #quiz_question is week_number.step_number.question_number
 summary(dfQR)
-table(dfQR$quiz_question) 
-table(dfQR$week_number) 
 table(dfQR$step_number) 
 table(dfQR$step)
+
+#step
+x = dfQR %>%
+  group_by(step) %>%
+  count(dfQR$step)
+
+table(dfQR$quiz_question) 
+table(dfQR$week_number) 
+
 barplot(table(dfQR$correct))
 
 

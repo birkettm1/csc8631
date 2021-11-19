@@ -26,6 +26,25 @@ dfLSR$left_at = as.POSIXlt(dfLSR$left_at)
 dfLSR$last_completed_step_at = as.POSIXlt(dfLSR$last_completed_step_at)
 dfLSR$stage_id = as.integer(dfLSR$stage_id)
 
+#leaving reason has multiple reasons for time issues so fettle these
+time = filter(dfLSR, grepl("time", dfLSR$leaving_reason, fixed = TRUE)) #time
+time$reason = "No time"
+easy = filter(dfLSR, grepl("easy", dfLSR$leaving_reason, fixed = TRUE)) #easy
+easy$reason = "Easy"
+hard = filter(dfLSR, grepl("hard", dfLSR$leaving_reason, fixed = TRUE)) #hard
+hard$reason = "Hard"
+expected = filter(dfLSR, grepl("expected", dfLSR$leaving_reason, fixed = TRUE)) #expected
+expected$reason = "Not as expected"
+goals = filter(dfLSR, grepl("goals", dfLSR$leaving_reason, fixed = TRUE)) #goals
+goals$reason = "No goals"
+notsay = filter(dfLSR, leaving_reason == "I prefer not to say") #not say
+notsay$reason = "Not saying"
+other = filter(dfLSR, leaving_reason == "Other") #other
+other$reason = "Other"
+
+dfLSR = bind_rows(time,easy,hard,expected,goals,notsay,other)
+dfLSR
+
 #working directory back to root
 setwd("..")
 

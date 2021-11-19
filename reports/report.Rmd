@@ -75,15 +75,37 @@ The addition of the feature engineered values gives us the potential to use this
 #### Leaving Survey Responses
 As discussed the "last completed step" value of the Leaving Survey data set matches back to the Step Activity data above so this provides the potential to investigate these data set simultaneously if required. The table is predominantely a categorical collection of the reasons for the leaving, and the last completed step and week. I will use step.
 
+Upon investigation the reason for leaving had multiple categories referring to the lack of time so all reasons that mentioned time were grouped as one to make it comparable with the other reasons
+
+```{r leaversPlot, echo=FALSE}
+  plot.leavers()
+```
+
+We can see that the last step completed by the majority of leavers was between 1 and 1.5 with another spike between 3 and 3.5, and also that leavers in the later stages of the course, 4,5,6 and 7 with none prior to that. The majority of reasons for leaving were due to the lack of time. There is the potential to investigate both the time of leaving and the reasons.
+
+The graphs to compare last completed step and stage seem to be at odd with each other. If students on leaving later in the data set, i.e by stage 5, how come the majority leave at step 1 to 1.5?
+
+```{r leaversStageStep, echo=FALSE}
+plot(dfLSR$last_completed_step, dfLSR$stage_id
+     , pch=16
+     , main="Comparison of Stage ID vs Last Completed Step"
+     , xlab="Step Number"
+     , ylab="Stage Number")
+```
+
+As we can see above it seems some leavers leave at the later stages of the course having never completed the earlier steps. 
 
 #### Question Responses
+The question responses table has the quiz question which includes the step number. Some feature engineering  was carried out to extract the correct step number and add it to a column.
 
 #### Video Stats
 
 #### Weekly Sentiment Analysis
 
 
-### 3 Understand
+### 3 Understand - Conclusion and Hypothesis
+
+
 
 ## Iteration 2
 Iteration 2 will further investigate the hypothesis identified in iteration 1 and will present the findings.

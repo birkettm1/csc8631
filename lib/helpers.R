@@ -133,3 +133,31 @@ plot.steps = function(){
           , ylab="Number of days")
   par(mfrow=c(1,1))
 }
+
+plot.leavers = function(){
+  par(mfrow=c(2,2))
+  
+  #barplot(table(substring(dfLSR$last_completed_step,1,3))
+  #        , main="Leavers Last Completed Step"
+  #        , xlab="Step Number"
+  #        , ylab="Number of Leavers")
+  
+  hist(as.numeric(substring(dfLSR$last_completed_step,1,3))
+       , main="Leavers Last Completed Step"
+       , xlab="Step Number"
+       , ylab="Number of Leavers")
+  
+  #reason
+  barplot(table(dfLSR$reason)
+          , main="Reasons for Leaving"
+          , xlab="Reason"
+          , ylab="Number of Leavers")
+  
+  barplot(table(dfLSR$stage_id)
+          ,ylim=c(0,200)
+          , main="Leaving Surveys by Stage"
+          , xlab="Stage"
+          , ylab="Number of Leavers")
+  
+  par(mfrow=c(1,1))
+}
