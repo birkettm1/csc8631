@@ -28,38 +28,60 @@ Report into investigation of Student Data using the CRISP-DM model. This report 
 
 The project has been set up using ProjectTemplate to provide some structure and repeatability, which will be tested on a regular basis. Version control is provided by Git and this report created with R Markdown.
 
-## Libraries
-
-* ReadR - library to provide extra functionality to import the data from CSV. In this case it allows me to import the data and assign type.
-* DiagrammeR - used to create a simple entity relationship diagram to focus the initial data understanding step.
-* DplyR - library to provide easier data management.
-
-## Relationships
-The data was investigated to reveal no primary keys, however columns such as learner_id could be used to create local relationships. The initial table structure has been envisaged as per below.
-
-![Entity Relationship Diagram showing how to relate each dataframe together](erd.png "Entity Relationship Diagram")
-
-Each relation was also investigated for potential primary keys, and those that didn't have one had one created using the row_id
-
 ## Iteration 1
 Iteration 1 was be used to investigate the data and generate a hypothesis for further investigation going through the steps outlined above. Once a hypothesis has been identified this will be further investigated in iteration 2.
 
 ### 1 - Import and Tidy
-The data was imported into R using Readr into 8 data frames from the original csv files, for easier analysis. The initial data sets were split out by dataset number which resulted in too many separate data frames to investigate. This step was done using ProjectTemplate's munge functionality. Due to the fact that the detected data types were not consistent the following data manipulation was carried out. 
+The data was supplied in csv files covering 8 different areas of the software over multiple stages, this imported into R into 8 data frames from the original for easier analysis, and the number of the file was included to give an indication of which stage of the course the data was created and to potentially aid further analysis. After initial investigation is was found that the detected data types were not consistent the following data manipulation was carried out. 
 
 * ID - to integer
 * Date time - to the local POSIX date time format
 
-The number of each file was added to the data frame as "stage_id"  to give an indication of which stage in the course the record was created at.
 
-Initial exploration of the data indicated that Learner_Id was a candidate for relating 6 of the 8 data frames as it was a common column, the data regarding video views was video centric and did not have learner id nor did the sentiment survey data.
+Initial exploration yielded the following entity relationship diagram:
+
+![Entity Relationship Diagram showing how to relate each dataframe together](erd.png "Entity Relationship Diagram")
+
+Each relation was also investigated for potential primary keys, this indicated that Learner_Id was a candidate for relating 6 of the 8 data frames as it was a common column, the data regarding video views was video centric and did not have learner id nor did the sentiment survey data. Any data didn't have one had one created using the row_id to uniquely identify the row. 
+
+Further analysis during visualisation of the data yielded a relationship  between Step Activity, Leaving Survey Responses and Question Response. The "step" data item is a compound of "week_number" and "step_number", which is present in the Step Activity table, this matches "last_completed_step" in Leaving Survey Responses at 1 decimal place. This is also present in Question Response where "quiz_question" is a concatenation of "week_number", "step_number" and "question_number", so we could potentially relate those three relations as an avenue for investigation.
+
+Upon investigation of the data it was decided that further investigation of Enrollments, Step Activity, Leaving Survey Responses, Question Response, Video Stats and Weekly Sentiment Surveys may yield an interesting topic for investigation. The other data was dismissed due to its limited breath.
 
 ### 2 Visualise
-Each data frame was investigated with a combination of viewing the data, creation of barplots and frequency tables. The data investigated was principally about Enrollments, Results, Leavers and Video Views. This was an attempt to find some interesting data to analyse, however, a lot of the investigation returned the majority of the data being unknown. For example, in the Enrollments data barplots of data items such as Country, Age Range, Employment returned the majority of the data was unknown as per below.
+Each data frame was investigated with a combination of viewing the data, creation of barplots, histograms, pie charts and frequency tables. Each table identified above will be visualised and some conclusions regarding potential investigation drawn. Data was related and cast as required.
 
-```{r countryBoxPlot, echo=FALSE}
+#### Enrollments
+In the Enrollments data barplots were used to visualise the spread of values in mainly categorical data. Data items invesigated were Country, Gender, Age Range, Highest Education Achieved, Employment Area and Employment Status which identified that the majority of the data was unknown in each case.
+
+```{r enrollmentPlots, echo=FALSE}
   plot.enrollments()
 ```
+It was concluded the Enrollment data may be used to add richness to an overall data investigation but there was no specific hypothesis to investigate.
+
+#### Step Activity
+The step data includes the step number as discussed at the import and tidy stage and the step start and end date with the learner_id. I have used the end date to indicate whether a step was complete for that student and how long the step took, this has resulted in feature engineering an "isComplete" flag and "completedTime" in days, and allows us to calculate step completion stats and time scales per step as per below.
+
+```{r stepActivityPlot, echo=FALSE}
+  plot.steps()
+```
+
+This shows us that there are far more completed steps than incomplete, and that incomplete steps are generally earlier in the course. However, there are still students who complete early steps and subsequently fail to complete later ones. There also indicates a wide spread of time to complete each step, with a variance of 103.1396.An outlier of this is *Step 2.8* which takes everyone very few days to complete.
+
+Due to adding the stage of the course we can also see that the time to complete each unit reduces as the course wears on, as does the number of students that complete each step.
+
+The addition of the feature engineered values gives us the potential to use this dataset in further analysis. There is potential to look at incomplete steps in relation to course leavers, and investigate the short completion times of step 2.8.
+
+#### Leaving Survey Responses
+As discussed the "last completed step" value of the Leaving Survey data set matches back to the Step Activity data above so this provides the potential to investigate these data set simultaneously if required. The table is predominantely a categorical collection of the reasons for the leaving, and the last completed step and week. I will use step.
+
+
+#### Question Responses
+
+#### Video Stats
+
+#### Weekly Sentiment Analysis
+
 
 ### 3 Understand
 
