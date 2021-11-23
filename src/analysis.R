@@ -124,15 +124,55 @@ barplot(table(dfVS$viewed_onehundred_percent))
 dfVS$id
 
 #totals
-dfVSTotals
-#pairs(dfQR[,4:5])
-ggplot(data = dfVS, aes(x = total_views, y = viewed_fifty_percent))
+summary(dfVSTotals)
+
+#par(mfrow=c(3,3))
+#hist(dfVSTotals$total_views)
+#hist(dfVSTotals$viewed_five_percent)
+#hist(dfVSTotals$viewed_ten_percent)
+#hist(dfVSTotals$viewed_twentyfive_percent)
+#hist(dfVSTotals$viewed_fifty_percent)
+#hist(dfVSTotals$viewed_seventyfive_percent)
+#hist(dfVSTotals$viewed_ninetyfive_percent)
+#hist(dfVSTotals$viewed_onehundred_percent)
+#par(mfrow=c(1,1))
+#pairs(dfVSTotals[,3:10])
+
+#export
+#write.csv(dfVSTotals,"c:\\temp\\viewtotals.csv", row.names = FALSE)
+
+#manual pivot
+summary(dfVSTotals)
+dfVSTotalsPivot = dfVSTotals %>% 
+  pivot_longer(!(1:2), names_to = "percentviewed", values_to = "count")
+dfVSTotalsPivot$title = paste(dfVSTotalsPivot$step_position, dfVSTotalsPivot$title, pos=" ")
+
+ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title= "Views by Video Completion", y="Views", x = "Video") + 
+  scale_fill_brewer(palette="PuBu", name="Viewed",
+                    breaks=c("05", "10", "25" ,"50","75","95", "99"),
+                    labels=c("5%", "10%", "25%" ,"50%","75%","95%", "100%")) +
+  theme(axis.text.x = element_text(angle = 90))
 
 #device
-dfVSDevice
+summary(dfVSDevice)
+pairs(dfVSDevice[,3:9])
+ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title= "Views by Device", y="Views", x = "Video") + 
+  scale_fill_brewer(palette="PuBu", name="Device")+
+  theme(axis.text.x = element_text(angle = 90))
 
 #origin
-dfVSLocation
+summary(dfVSLocation)
+pairs(dfVSLocation[,3:10])
+ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title= "Views by Location", y="Views", x = "Video") + 
+  scale_fill_brewer(palette="PuBu", name="Location") +
+  theme(axis.text.x = element_text(angle = 90))
+
 
 #something about sentiment - relate back via week_number
 nrow(dfSS) #n items
