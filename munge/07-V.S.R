@@ -23,6 +23,11 @@ dfVS %>%
 
 dfVS$stage_id = as.integer(dfVS$stage_id)
 
+#create sub views for working with separate datasets
+dfVSTotals = dfVS[,1:15]
+dfVSDevice = dfVS[,c(1,2,16:21)]
+dfVSLocation = dfVS[,c(1,2,22:28)]
+
 #working directory back to root
 setwd("..")
 

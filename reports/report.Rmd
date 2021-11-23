@@ -29,7 +29,7 @@ Report into investigation of Student Data using the CRISP-DM model. This report 
 The project has been set up using ProjectTemplate to provide some structure and repeatability, which will be tested on a regular basis. Version control is provided by Git and this report created with R Markdown.
 
 ## Iteration 1
-Iteration 1 was be used to investigate the data and generate a hypothesis for further investigation going through the steps outlined above. Once a hypothesis has been identified this will be further investigated in iteration 2.
+Iteration 1 was be used to investigate the data and generate a hypothesis for further investigation going through the steps outlined above. Once a hypothesis has been identified this will be further investigated in iteration 2. A graphical summary of each data set will be presented with potential hypothesis and further analysis will be carried out on iteration 2.
 
 ### 1 - Import and Tidy
 The data was supplied in csv files covering 8 different areas of the software over multiple stages, this imported into R into 8 data frames from the original for easier analysis, and the number of the file was included to give an indication of which stage of the course the data was created and to potentially aid further analysis. After initial investigation is was found that the detected data types were not consistent the following data manipulation was carried out. 
@@ -52,7 +52,7 @@ Upon investigation of the data it was decided that further investigation of Enro
 Each data frame was investigated with a combination of viewing the data, creation of barplots, histograms, pie charts and frequency tables. Each table identified above will be visualised and some conclusions regarding potential investigation drawn. Data was related and cast as required.
 
 #### Enrollments
-In the Enrollments data barplots were used to visualise the spread of values in mainly categorical data. Data items invesigated were Country, Gender, Age Range, Highest Education Achieved, Employment Area and Employment Status which identified that the majority of the data was unknown in each case.
+Enrollments is a multivariate dataset with n=37296 items and p=14 variables. For each variable barplots were used to visualise the spread of values in mainly categorical data. Data items invesigated were Country, Gender, Age Range, Highest Education Achieved, Employment Area and Employment Status which identified that the majority of the data was unknown in each case.
 
 ```{r enrollmentPlots, echo=FALSE}
   plot.enrollments()
@@ -60,7 +60,7 @@ In the Enrollments data barplots were used to visualise the spread of values in 
 It was concluded the Enrollment data may be used to add richness to an overall data investigation but there was no specific hypothesis to investigate.
 
 #### Step Activity
-The step data includes the step number as discussed at the import and tidy stage and the step start and end date with the learner_id. I have used the end date to indicate whether a step was complete for that student and how long the step took, this has resulted in feature engineering an "isComplete" flag and "completedTime" in days, and allows us to calculate step completion stats and time scales per step as per below.
+The step data is multivariate data with n=423072 items and p=9 variables after the feature engineeering outlined below. The step data includes the step number as discussed at the import and tidy stage and the step start and end date with the learner_id. I have used the end date to indicate whether a step was complete for that student and how long the step took, this has resulted in 2 new columns - "isComplete" flag and "completedTime" in days, and allows us to calculate step completion stats and time scales per step as per below.
 
 ```{r stepActivityPlot, echo=FALSE}
   plot.steps()
@@ -73,7 +73,7 @@ Due to adding the stage of the course we can also see that the time to complete 
 The addition of the feature engineered values gives us the potential to use this dataset in further analysis. There is potential to look at incomplete steps in relation to course leavers, and investigate the short completion times of step 2.8.
 
 #### Leaving Survey Responses
-As discussed the "last completed step" value of the Leaving Survey data set matches back to the Step Activity data above so this provides the potential to investigate these data set simultaneously if required. The table is predominantely a categorical collection of the reasons for the leaving, and the last completed step and week. I will use step.
+The leaving survey respones is multivariate data with n=403 items and p=10 variables. It is a smaller dataset then prevously investigated. As discussed the "last completed step" value of the Leaving Survey data set matches back to the Step Activity data above so this provides the potential to investigate these data set simultaneously if required. The table is predominantely a categorical collection of the reasons for the leaving, and the last completed step and week. I will use step.
 
 Upon investigation the reason for leaving had multiple categories referring to the lack of time so all reasons that mentioned time were grouped as one to make it comparable with the other reasons
 
@@ -96,12 +96,32 @@ plot(dfLSR$last_completed_step, dfLSR$stage_id
 As we can see above it seems some leavers leave at the later stages of the course having never completed the earlier steps. 
 
 #### Question Responses
-The question responses table has the quiz question which includes the step number. Some feature engineering  was carried out to extract the correct step number and add it to a column.
+The question responses data  is multivariate data with n=176463 items and p=12 variables after the feature engineeering outlined below. The question responses table has the quiz question which includes the step number. Some feature engineering was carried out to extract the correct step number and add it to a column, should there be a need to relate to the the activity steps 
+
+NARRATIVE!
+
+```{r plotQuestionResponses, echo=FALSE}
+  plot.question.responses()
+```
 
 #### Video Stats
+The video stats data is multivariate data with n=65 items and p=29 variables. There are significantly more data variables in this relation then in those examined previously, and significantly less data items. To handle the increased number of data items, the data was split into views by percentage complete, type of device and location of the view.
+
+NARRATIVE!
+
+```{r plotVideoStats, echo=FALSE}
+  plot.video.stats()
+```
+
 
 #### Weekly Sentiment Analysis
+The video stats data is multivariate data with n=181 items and p=6 variables. This table has extensive character based data.
 
+NARRATIVE!
+
+```{r plotSentimentAnalysis, echo=FALSE}
+  plot.sentiment()
+```
 
 ### 3 Understand - Conclusion and Hypothesis
 
@@ -109,6 +129,11 @@ The question responses table has the quiz question which includes the step numbe
 
 ## Iteration 2
 Iteration 2 will further investigate the hypothesis identified in iteration 1 and will present the findings.
+
+Location Analysis
+Multivariate Analysis
+GGPlot2
+
 
 ### Findings
 To answer the hypothesis XYZ the findings are that ABC

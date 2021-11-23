@@ -161,3 +161,54 @@ plot.leavers = function(){
   
   par(mfrow=c(1,1))
 }
+
+plot.question.responses = function(x){
+  par(mfrow=c(3,2))
+  plot(dfQR$week_number, dfQR$step     
+       , pch=16
+       , main="Comparison of Step vs Week Number"
+       , xlab="Week Number"
+       , ylab="Step Number")
+  
+  #hist(dfQR$response)
+  #boxplot(dfQR$question_number ~ dfQR$correct)
+  
+  answerCount = dfQR %>%
+    group_by(quiz_question) %>%
+    count(dfQR$response)
+  answerCount = select(answerCount, quiz_question, n)
+  barplot(answerCount$n
+          , main="Count of Responses by Question"
+          , xlab="Question"
+          , ylab="Count")
+  
+  
+  answerCount = dfQR %>%
+    group_by(quiz_question) %>%
+    count(correct) 
+  
+  correctCount = filter(answerCount, correct==TRUE)
+  barplot(correctCount$n
+          , las=2
+          , main="Count of Correct Answer by Question"
+          , xlab="Question"
+          , ylab="Count")
+  
+  incorrectCount = filter(answerCount, correct==FALSE)
+  
+  barplot(incorrectCount$n
+          , las=2
+          , main="Count of Incorrect Answer by Question"
+          , xlab="Question"
+          , ylab="Count"
+          , cex.main=1, cex.lab=1, cex.axis=1)
+  par(mfrow=c(1,1))
+}
+
+plot.video.stats = function(){
+  
+}
+
+plot.sentiment = function(){
+  
+}
