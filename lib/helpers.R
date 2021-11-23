@@ -211,31 +211,6 @@ plot.question.responses = function(x){
   par(mfrow=c(1,1))
 }
 
-plot.video.stats = function(){
-  #render number of views by percent complete
-  ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
-    geom_bar(stat="identity", position="dodge") +
-    labs(title= "Views by Video Completion", y="Views", x = "Video") + 
-    scale_fill_brewer(palette="PuBu", name="Viewed",
-                      breaks=c("05", "10", "25" ,"50","75","95", "99"),
-                      labels=c("5%", "10%", "25%" ,"50%","75%","95%", "100%")) +
-    theme(axis.text.x = element_text(angle = 90))
-  
-  #video by device
-  ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
-    geom_bar(stat="identity", position="dodge") +
-    labs(title= "Views by Device", y="Views", x = "Video") + 
-    scale_fill_brewer(palette="PuBu", name="Device")+
-    theme(axis.text.x = element_text(angle = 90))
-  
-  #video by location
-  ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
-    geom_bar(stat="identity", position="dodge") +
-    labs(title= "Views by Location", y="Views", x = "Video") + 
-    scale_fill_brewer(palette="PuBu", name="Location") +
-    theme(axis.text.x = element_text(angle = 90))
-}
-
 plot.sentiment = function(){
   
 }
