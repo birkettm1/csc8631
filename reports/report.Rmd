@@ -55,7 +55,67 @@ Each data frame was investigated with a combination of viewing the data, creatio
 Enrollments is a multivariate dataset with n=37296 items and p=14 variables. For each variable barplots were used to visualise the spread of values in mainly categorical data. Data items invesigated were Country, Gender, Age Range, Highest Education Achieved, Employment Area and Employment Status which identified that the majority of the data was unknown in each case.
 
 ```{r enrollmentPlots, echo=FALSE}
-  plot.enrollments()
+
+  par(mfrow=c(3,2))
+  #graph the enrollment data
+  
+  #country
+  countryData = dfE %>%
+    group_by(country) %>%
+    count(dfE$country) #do a count
+  countryData = filter(countryData, n > 100) #filter only where greater than 100
+  countryData = select(countryData, country, n) #select the correct cols
+  barplot(countryData$n, main="Enrollments by country greater than 100",
+          names.arg = c("Australia", 'GB', "India", "Nigeria", "Unknown", "US"))
+  #pie(countryData$n, labels = countryData$country, main="Enrollments by country greater than 10")
+  
+  #gender
+  genderData = dfE %>%
+    group_by(gender) %>%
+    count(dfE$gender)
+  genderData = select(genderData, gender, n)
+  barplot(genderData$n, main="Enrollments by gender",
+          names.arg = c("Female", 'Male', "Nonbinary", "Other", "Unknown"))
+  #pie(genderData$n, labels = genderData$gender, main="Enrollments by gender")
+  
+  #age range
+  agerangeData = dfE %>%
+    group_by(age_range) %>%
+    count(dfE$age_range)
+  agerangeData = select(agerangeData, age_range, n)
+  barplot(agerangeData$n, main="Enrollments by age range",
+          names.arg = c("<18", ">65", "18-25", "26-35", "36-45", "46-55", "56-65","Unknown"))
+  #pie(agerangeData$n, labels = agerangeData$age_range, main="Enrollments by age range")
+  
+  #highest_education_level
+  highestEducationData = dfE %>%
+    group_by(highest_education_level) %>%
+    count(dfE$highest_education_level)
+  highestEducationData = select(highestEducationData, highest_education_level, n)
+  barplot(highestEducationData$n, main="Enrollments by highest education",
+          names.arg = c("Apprenticeship", "<Secondary", "Professional", "Secondary", "Tertiary", "Degree", "Doctrate", "Masters", "Unknown"))
+  #pie(highestEducationData$n, labels = highestEducationData$highest_education_level, main="Enrollments by highest education")
+  
+  #employment area
+  employmentareaData = dfE %>%
+    group_by(employment_area) %>%
+    count(dfE$employment_area)
+  employmentareaData = select(employmentareaData, employment_area, n)
+  barplot(employmentareaData$n, main="Enrollments by employment area",
+          names.arg = employmentareaData$employment_area)
+  #pie(employmentareaData$n, labels = employmentareaData$employment_area, main="Enrollments by employment area")
+  
+  #employment area
+  employmentstatusData = dfE %>%
+    group_by(employment_status) %>%
+    count(dfE$employment_status)
+  employmentstatusData = select(employmentstatusData, employment_status, n)
+  barplot(employmentstatusData$n, main="Enrollments by employment status",
+          names.arg = employmentstatusData$employment_status)
+  #pie(employmentstatusData$n, labels = employmentstatusData$employment_status, main="Enrollments by employment status")
+  
+  par(mfrow=c(1,1))
+  
 ```
 It was concluded the Enrollment data may be used to add richness to an overall data investigation but there was no specific hypothesis to investigate.
 
@@ -63,7 +123,35 @@ It was concluded the Enrollment data may be used to add richness to an overall d
 The step data is multivariate data with n=423072 items and p=9 variables after the feature engineeering outlined below. The step data includes the step number as discussed at the import and tidy stage and the step start and end date with the learner_id. I have used the end date to indicate whether a step was complete for that student and how long the step took, this has resulted in 2 new columns - "isComplete" flag and "completedTime" in days, and allows us to calculate step completion stats and time scales per step as per below.
 
 ```{r stepActivityPlot, echo=FALSE}
-  plot.steps()
+  par(mfrow=c(3,2))
+
+  #plot complete or not
+  barplot(table(dfSA$isComplete), ylim=c(0, 400000) 
+          , main="Total Completed Steps"
+          , xlab="Complete"
+          , ylab="Count of Activity Steps")
+  
+  boxplot(dfSA$step ~ dfSA$isComplete
+          , main="Activity vs Step Number"
+          , xlab="Complete"
+          , ylab="Step Number")
+  
+  boxplot(as.numeric(dfSA$timeToComplete) ~ as.numeric(substring(dfSA$step,1,3))
+          , main="Time to Complete by Step"
+          , xlab="Step"
+          , ylab="Number of days")
+  
+  barplot(table(dfSA$stage_id) 
+          , main="Total Completed Steps by Course Stage"
+          , xlab="Stage"
+          , ylab="Complete steps")
+  
+  boxplot(as.numeric(dfSA$timeToComplete) ~ dfSA$stage_id
+          , main="Time to Complete by Course Stage"
+          , xlab="Stage"
+          , ylab="Number of days")
+  
+  par(mfrow=c(1,1))
 ```
 
 This shows us that there are far more completed steps than incomplete, and that incomplete steps are generally earlier in the course. However, there are still students who complete early steps and subsequently fail to complete later ones. There also indicates a wide spread of time to complete each step, with a variance of 103.1396.An outlier of this is *Step 2.8* which takes everyone very few days to complete.
@@ -78,7 +166,30 @@ The leaving survey respones is multivariate data with n=403 items and p=10 varia
 Upon investigation the reason for leaving had multiple categories referring to the lack of time so all reasons that mentioned time were grouped as one to make it comparable with the other reasons
 
 ```{r leaversPlot, echo=FALSE}
-  plot.leavers()
+
+  par(mfrow=c(2,2))
+
+  #last step
+  hist(as.numeric(substring(dfLSR$last_completed_step,1,3))
+       , main="Leavers Last Completed Step"
+       , xlab="Step Number"
+       , ylab="Number of Leavers")
+  
+  #reason
+  barplot(table(dfLSR$reason)
+          , main="Reasons for Leaving"
+          , xlab="Reason"
+          , ylab="Number of Leavers")
+  
+  #stage
+  barplot(table(dfLSR$stage_id)
+          ,ylim=c(0,200)
+          , main="Leaving Surveys by Stage"
+          , xlab="Stage"
+          , ylab="Number of Leavers")
+  
+  par(mfrow=c(1,1))
+  
 ```
 
 We can see that the last step completed by the majority of leavers was between 1 and 1.5 with another spike between 3 and 3.5, and also that leavers in the later stages of the course, 4,5,6 and 7 with none prior to that. The majority of reasons for leaving were due to the lack of time. There is the potential to investigate both the time of leaving and the reasons.
@@ -101,7 +212,51 @@ The question responses data  is multivariate data with n=176463 items and p=12 v
 NARRATIVE!
 
 ```{r plotQuestionResponses, echo=FALSE}
-  plot.question.responses()
+
+ par(mfrow=c(3,2))
+  plot(dfQR$week_number, dfQR$step     
+       , pch=16
+       , main="Comparison of Step vs Week Number"
+       , xlab="Week Number"
+       , ylab="Step Number")
+  
+  #hist(dfQR$response)
+  #boxplot(dfQR$question_number ~ dfQR$correct)
+  
+  answerCount = dfQR %>%
+    group_by(quiz_question) %>%
+    count(dfQR$response)
+  answerCount = select(answerCount, quiz_question, n)
+  
+  #responses by question
+  barplot(answerCount$n
+          , main="Count of Responses by Question"
+          , xlab="Question"
+          , ylab="Count")
+  
+  answerCount = dfQR %>%
+    group_by(quiz_question) %>%
+    count(correct) 
+  
+  #correct answers
+  correctCount = filter(answerCount, correct==TRUE)
+  barplot(correctCount$n
+          , las=2
+          , main="Count of Correct Answer by Question"
+          , xlab="Question"
+          , ylab="Count")
+  
+  incorrectCount = filter(answerCount, correct==FALSE)
+  
+  #incorrect answers
+  barplot(incorrectCount$n
+          , las=2
+          , main="Count of Incorrect Answer by Question"
+          , xlab="Question"
+          , ylab="Count"
+          , cex.main=1, cex.lab=1, cex.axis=1)
+  par(mfrow=c(1,1))
+  
 ```
 
 #### Video Stats
@@ -133,17 +288,44 @@ NARRATIVE!
     labs(title= "Views by Location", y="Views", x = "Video") + 
     scale_fill_brewer(palette="PuBu", name="Location") +
     theme(axis.text.x = element_text(angle = 90))
-  
 ```
 
 
 #### Weekly Sentiment Analysis
-The video stats data is multivariate data with n=181 items and p=6 variables. This table has extensive character based data.
+The video stats data is multivariate data with n=181 items and p=6 variables. This table has a categorical propertly rating and character data to cover the sentiment. I will not be looking to cover sentiment analysis in this work so only the categorical value will be looked at.
 
 NARRATIVE!
 
 ```{r plotSentimentAnalysis, echo=FALSE}
-  plot.sentiment()
+
+par(mfrow=c(2,2))
+#weekly experience ratings provided
+barplot(table(dfSS$week_number)
+        , main="Weekly Experience Rating"
+        , xlab="Week"
+        , ylab="Count")
+
+#weekly experience rating
+barplot(table(dfSS$experience_rating)
+        , main="Weekly Experience Rating"
+        , xlab="Rating"
+        , ylab="Count")
+
+#jitter between week number and experience
+ggplot(dfSS, aes(week_number, experience_rating)) + 
+  geom_jitter() + 
+  labs(title= "Weekly Experience Rating", y="Experience Rating", x = "Week Number") + 
+  scale_fill_brewer(palette="PuBu", name="Location")
+
+#stacked bar week number and experience
+ggplot(dfSS, aes(x=week_number, fill=factor(experience_rating))) + 
+  geom_bar(position="stack") +
+  labs(title= "Weekly Experience Rating", y="Experience Rating", x = "Week Number") +
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu", name="Location")
+
+par(mfrow=c(1,1))
+
 ```
 
 ### 3 Understand - Conclusion and Hypothesis

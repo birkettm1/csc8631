@@ -180,6 +180,38 @@ ncol(dfSS) #p variables
 summary(dfSS)
 table(dfSS$reason)
 count(dfSS, reason)
+#experience_rating categorical, reason string
+barplot(table(dfSS$experience_rating)
+        , main="Weekly Experience Rating"
+        , xlab="Rating"
+        , ylab="Count")
+table(dfSS$experience_rating)
+table(dfSS$week_number)
+hist(dfSS$experience_rating)
+select(dfSS, id, experience_rating, week_number)
+typeof(dfSS$week_number)
+
+ggplot(data = dfSS, aes(y = experience_rating, x = week_number )) +
+  geom_bar(stat="identity") +
+  labs(title= "Weekly Experience Rating", y="Experience Rating", x = "Week Number") + 
+  scale_fill_brewer(palette="PuBu", name="Location")
+
+ggplot(data = dfSS, aes(fill = experience_rating, x = week_number, y=experience_rating)) + 
+  geom_bar(stat="identity", position = "dodge")
+
+ggplot(dfSS, aes(x = experience_rating, fill = week_number )) + 
+  geom_bar(position = "stack")
+
+barplot(table(dfSS$week_number)
+        , main="Weekly Experience Rating"
+        , xlab="Week"
+        , ylab="Count")
+
+ggplot(dfSS, aes(x=week_number, fill=factor(experience_rating))) + 
+  geom_bar(position="stack") +
+  labs(title= "Weekly Experience Rating", y="Experience Rating", x = "Week Number") +
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu", name="Location")
 
 #Understand 
 
