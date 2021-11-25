@@ -38,6 +38,8 @@ dfVSTotals = select(dfVSTotals, step_position, title, "05", "10", "25", "50", "7
 dfVSTotalsPivot = dfVSTotals %>% 
   pivot_longer(!(1:2), names_to = "percentviewed", values_to = "count") #createpivot
 
+dfVSTotalsPivot$title = paste(dfVSTotalsPivot$step_position, dfVSTotalsPivot$title, pos=" ") #alter title
+
 #devices
 dfVSDevice = dfVS[,c(1,2,4, 16:21)]
 dfVSDevice$Console = as.percent(dfVSDevice$total_views, dfVSDevice$console_device_percentage)
@@ -48,7 +50,7 @@ dfVSDevice$Tablet = as.percent(dfVSDevice$total_views, dfVSDevice$tablet_device_
 dfVSDevice = select(dfVSDevice, step_position, title, Console, Desktop, Mobile, TV, Tablet)
 dfVSDevicePivot = dfVSDevice %>% 
   pivot_longer(!(1:2), names_to = "percentviewed", values_to = "count") #createpivot
-
+dfVSDevicePivot$title = paste(dfVSDevicePivot$step_position, dfVSDevicePivot$title, pos=" ")
 
 #location
 dfVSLocation = dfVS[,c(1,2,4,22:28)]
@@ -62,6 +64,7 @@ dfVSLocation$Antartica = as.percent(dfVSLocation$total_views, dfVSLocation$antar
 dfVSLocation = select(dfVSLocation, step_position, title, Europe, Oceania, Asia, NorthAmerica, SouthAmerica, Africa, Antartica)
 dfVSLocationPivot = dfVSLocation %>% 
   pivot_longer(!(1:2), names_to = "percentviewed", values_to = "count") #createpivot
+dfVSLocationPivot$title = paste(dfVSLocationPivot$step_position, dfVSLocationPivot$title, pos=" ")
 
 
 

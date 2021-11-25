@@ -72,6 +72,7 @@ plot.enrollments()
 #step is a week_number.step_number relate to step
 nrow(dfSA) #n items
 ncol(dfSA) #p variables
+table(dfSA)
 dfSA = filter(dfSA, step == 1.1)
 
 #identify complete or incomplete
@@ -112,7 +113,51 @@ hist(dfQR$week_number)
 hist(as.numeric(dfQR$step))
 barplot(dfQR$step_number)
 
-plot.question.responses()
+
+par(mfrow=c(3,2))
+plot(dfQR$week_number, dfQR$step     
+     , pch=16
+     , main="Comparison of Step vs Week Number"
+     , xlab="Week Number"
+     , ylab="Step Number")
+
+#hist(dfQR$response)
+#boxplot(dfQR$question_number ~ dfQR$correct)
+
+answerCount = dfQR %>%
+  group_by(quiz_question) %>%
+  count(dfQR$response)
+answerCount = select(answerCount, quiz_question, n)
+
+#responses by question
+barplot(answerCount$n
+        , main="Count of Responses by Question"
+        , xlab="Question"
+        , ylab="Count")
+
+answerCount = dfQR %>%
+  group_by(quiz_question) %>%
+  count(correct) 
+
+#correct answers
+correctCount = filter(answerCount, correct==TRUE)
+barplot(correctCount$n
+        , las=2
+        , main="Count of Correct Answer by Question"
+        , xlab="Question"
+        , ylab="Count")
+
+incorrectCount = filter(answerCount, correct==FALSE)
+
+#incorrect answers
+barplot(incorrectCount$n
+        , las=2
+        , main="Count of Incorrect Answer by Question"
+        , xlab="Question"
+        , ylab="Count"
+        , cex.main=1, cex.lab=1, cex.axis=1)
+par(mfrow=c(1,1))
+
 
 #video stats
 nrow(dfVS) #n items
@@ -147,9 +192,11 @@ dfVSTotalsPivot = dfVSTotals %>%
   pivot_longer(!(1:2), names_to = "percentviewed", values_to = "count")
 dfVSTotalsPivot$title = paste(dfVSTotalsPivot$step_position, dfVSTotalsPivot$title, pos=" ")
 
+#percentage complete
 ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
   geom_bar(stat="identity", position="dodge") +
   labs(title= "Views by Video Completion", y="Views", x = "Video") + 
+  theme_bw() + 
   scale_fill_brewer(palette="PuBu", name="Viewed",
                     breaks=c("05", "10", "25" ,"50","75","95", "99"),
                     labels=c("5%", "10%", "25%" ,"50%","75%","95%", "100%")) +
@@ -162,6 +209,7 @@ ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.charact
   geom_bar(stat="identity", position="dodge") +
   labs(title= "Views by Device", y="Views", x = "Video") + 
   scale_fill_brewer(palette="PuBu", name="Device")+
+  theme_bw() + 
   theme(axis.text.x = element_text(angle = 90))
 
 #origin
@@ -171,6 +219,7 @@ ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.chara
   geom_bar(stat="identity", position="dodge") +
   labs(title= "Views by Location", y="Views", x = "Video") + 
   scale_fill_brewer(palette="PuBu", name="Location") +
+  theme_bw() + 
   theme(axis.text.x = element_text(angle = 90))
 
 
@@ -209,9 +258,9 @@ barplot(table(dfSS$week_number)
 
 ggplot(dfSS, aes(x=week_number, fill=factor(experience_rating))) + 
   geom_bar(position="stack") +
-  labs(title= "Weekly Experience Rating", y="Experience Rating", x = "Week Number") +
+  labs(title= "Weekly Experience Rating", y="Count", x = "Week Number") +
   theme_bw() + 
-  scale_fill_brewer(palette="PuBu", name="Location")
+  scale_fill_brewer(palette="PuBu", name="Experience Rating")
 
 #Understand 
 
