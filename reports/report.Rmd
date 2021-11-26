@@ -214,52 +214,44 @@ As we can see there are significant differences in number of times each question
 
 Each step in the step activity data frame also has associated video view data. The video stats data is multivariate data with n=65 items and p=29 variables. There are significantly more data variables in this relation then in those examined previously, and significantly less data items. 
 
-The data in this relation can be subsetted into data pertaining to percentage complete, type of device and location of the video view, so three data sets were created with just this data present. Some work was then done to convert the data from percentages to raw numbers, and then to pivot the result to allow some insights into the number of views.
+The data in this relation can be subsetted into data pertaining to percentage complete, type of device and location of the video view, so three data sets were created with just this data present. Some work was then done to convert the data from percentages to raw numbers, and then to pivot the result to allow some insights into the number of views, views by device and views by location in Figures 7, 8 and 9 below.
 
-It can be seen below that the number of views which watched the whole video dropped off as they viewer got further through. For example we can see for the first video "1.1. Welcome to the course" that 1500 views completed 5% of the video, which drops to 1200 who completed 100%. This is then presented for each video throughout the course.
+```{r plotVideoStatsOverall, echo=FALSE, fig.cap="Video Views"}
 
-```{r plotVideoStats, echo=FALSE, out.width="50%", fig.cap="Video View Completions"}
+vid1 = ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title= "Views by Video Completion", y="Views", x = "Video") + 
+  scale_fill_brewer(palette="PuBu", name="Viewed",
+                    breaks=c("05", "10", "25" ,"50","75","95", "99"),
+                    labels=c("5%", "10%", "25%" ,"50%","75%","95%", "100%")) +
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90))
 
-  #render number of views by percent complete
-  ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
-    geom_bar(stat="identity", position="dodge") +
-    labs(title= "Views by Video Completion", y="Views", x = "Video") + 
-    scale_fill_brewer(palette="PuBu", name="Viewed",
-                      breaks=c("05", "10", "25" ,"50","75","95", "99"),
-                      labels=c("5%", "10%", "25%" ,"50%","75%","95%", "100%")) +
-    theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90))
+#video by device
+vid2 = ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title= "Views by Device", y="Views", x = "Video") + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu", name="Device") +
+  theme(axis.text.x = element_text(angle = 90))
+
+#video by location
+vid3 = ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title= "Views by Location", y="Views", x = "Video") + 
+  scale_fill_brewer(palette="PuBu", name="Location") +
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90))
+
+grid.arrange(vid1, vid2, vid3, ncol=2, nrow=2)
 
 ```
 
-It can be seen that as the course progresses the volume of students engaging with each video reduces reasonably significantly other than "1.5 Privacy online and offline" It can also be seen that some videos see a significant drop between 95% and 100% completion.
+It can be seen in the barplot for the Views by Video completion that the number of views which watched the whole video dropped off as they viewer got further through. For example we can see for the first video "1.1. Welcome to the course" that 1500 views completed 5% of the video, which drops to 1200 who completed 100%. This is then presented for each video throughout the course. As the course progresses the volume of students engaging with each video reduces reasonably significantly other than "1.5 Privacy online and offline" It can also be seen that some videos see a significant drop between 95% and 100% completion.
 
-When viewing views by device it can be seen that no video was viewed on a tablet or TV, all views were by Console, Desktop or Mobile. It can be seen that by far the majority of views were on a Console throughout the length of the course, so it may be concluded the videos should be designed to play best on a console.
+When viewing Views by Device it can be seen that no video was viewed on a tablet or TV, all views were by Console, Desktop or Mobile. It can be seen that by far the majority of views were on a Console throughout the length of the course, so it may be concluded the videos should be designed to play best on a console. The data shown reflects the same changes in the volume of use as shown above, i.e. that "1.5 Privacy online and offline" shows an increase in views in an otherwise downward trend.
 
-```{r plotVideoDevice, echo=FALSE, out.width="50%", fig.cap="Video View by Device"}
-  #video by device
-  ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
-    geom_bar(stat="identity", position="dodge") +
-    labs(title= "Views by Device", y="Views", x = "Video") + 
-    theme_bw() + 
-    scale_fill_brewer(palette="PuBu", name="Device") +
-    theme(axis.text.x = element_text(angle = 90))
-```
-
-The data shown reflects the same changes in the volume of use as shown above, i.e. that "1.5 Privacy online and offline" shows an increase in views in an otherwise downward trend.
-
-By viewing views by location it can be seen that the majority of views are from Europe with non at all from Antarctica and few from North America, Oceania and South America.
-
-```{r videoByLocation, echo=FALSE, out.width="50%", fig.cap="Video View by Location"}
-  #video by location
-  ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
-    geom_bar(stat="identity", position="dodge") +
-    labs(title= "Views by Location", y="Views", x = "Video") + 
-    scale_fill_brewer(palette="PuBu", name="Location") +
-    theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90))
-```
-The data shown reflects the same changes in the volume of use as shown above, i.e. that "1.5 Privacy online and offline" shows an increase in views in an otherwise downward trend.
+By viewing Views by Location it can be seen that the majority of views are from Europe with non at all from Antarctica and few from North America, Oceania and South America. The data shown reflects the same changes in the volume of use as shown above, i.e. that "1.5 Privacy online and offline" shows an increase in views in an otherwise downward trend.
 
 There is potential to link views with stages and we could potentially look at leavers by location and device by using this view data along with the leaver survey responses. We could also look at test performance related to video completion, location or devices.
 
@@ -267,7 +259,7 @@ The final data frame related to the course stage is the weekly sentiment data, t
 
 As we can see from the weekly experience data below, across the three weeks of the course the total sentiment data provided by the student cohort went down from 73 to 45, although the experience ratings being provided remained consistent at approximately 90% providing a rating of 3.
 
-```{r plotSentimentAnalysis, echo=FALSE, out.width="65%", fig.cap="Sentiment Completions"}
+```{r plotSentimentAnalysis, echo=FALSE, out.width="75%", fig.cap="Sentiment Completions"}
 
 ggplot(dfSS, aes(x=week_number, fill=factor(experience_rating))) + 
   geom_bar(position="stack") +

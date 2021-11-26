@@ -299,39 +299,38 @@ summary(dfVSTotals)
 
 #manual pivot
 summary(dfVSTotals)
-dfVSTotalsPivot = dfVSTotals %>% 
-  pivot_longer(!(1:2), names_to = "percentviewed", values_to = "count")
-dfVSTotalsPivot$title = paste(dfVSTotalsPivot$step_position, dfVSTotalsPivot$title, pos=" ")
+#dfVSTotalsPivot = dfVSTotals %>% 
+#  pivot_longer(!(1:2), names_to = "percentviewed", values_to = "count")
+#dfVSTotalsPivot$title = paste(dfVSTotalsPivot$step_position, dfVSTotalsPivot$title, pos=" ")
 
-#percentage complete
-ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
+
+vid1 = ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
   geom_bar(stat="identity", position="dodge") +
   labs(title= "Views by Video Completion", y="Views", x = "Video") + 
-  theme_bw() + 
   scale_fill_brewer(palette="PuBu", name="Viewed",
                     breaks=c("05", "10", "25" ,"50","75","95", "99"),
                     labels=c("5%", "10%", "25%" ,"50%","75%","95%", "100%")) +
-  theme(axis.text.x = element_text(angle = 90))
-
-#device
-summary(dfVSDevice)
-pairs(dfVSDevice[,3:9])
-ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
-  geom_bar(stat="identity", position="dodge") +
-  labs(title= "Views by Device", y="Views", x = "Video") + 
-  scale_fill_brewer(palette="PuBu", name="Device")+
   theme_bw() + 
   theme(axis.text.x = element_text(angle = 90))
 
-#origin
-summary(dfVSLocation)
-pairs(dfVSLocation[,3:10])
-ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
+#video by device
+vid2 = ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title= "Views by Device", y="Views", x = "Video") + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu", name="Device") +
+  theme(axis.text.x = element_text(angle = 90))
+
+#video by location
+vid3 = ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
   geom_bar(stat="identity", position="dodge") +
   labs(title= "Views by Location", y="Views", x = "Video") + 
   scale_fill_brewer(palette="PuBu", name="Location") +
   theme_bw() + 
   theme(axis.text.x = element_text(angle = 90))
+
+grid.arrange(vid1, vid2, vid3, ncol=2, nrow=2)
+
 
 
 #something about sentiment - relate back via week_number
