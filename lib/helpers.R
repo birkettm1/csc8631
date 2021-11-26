@@ -34,14 +34,14 @@ create.erd.flowchart <- function()
       tab5 -> tab8;
       }
 
-      [1]: 'Archtype (dfAR)'
-      [2]: 'Enrollments (dfE)'
-      [3]: 'Team Member (dfTM)'
-      [4]: 'Leaving Survey (dfLSR)'
-      [5]: 'Step Activity (dfSA)'
-      [6]: 'Question Response (dfQR)'
-      [7]: 'Video Stats (dfVS)'
-      [8]: 'Sentiment Survey (dfSS)'
+      [1]: 'Archtype'
+      [2]: 'Enrollments'
+      [3]: 'Team Member'
+      [4]: 'Leaving Survey'
+      [5]: 'Step Activity'
+      [6]: 'Question Response'
+      [7]: 'Video Stats'
+      [8]: 'Sentiment Survey'
       ")
   
 }

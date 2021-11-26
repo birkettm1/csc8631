@@ -54,6 +54,8 @@ create.erd.flowchart()
 #boxplot(continuous ~ categorical) #continuous vs a categorical
 #pairs(data[,colNumbers]) #continuous vs continuous
 
+summary(dfTM)
+
 #enrollments - people
 summary(dfE)
 nrow(dfE) #n items
@@ -68,6 +70,109 @@ barplot(table(dfE$employment_status))
 barplot(table(dfE$detected_country))
 plot.enrollments()
 
+par(mfrow=c(2,3))
+#graph the enrollment data
+
+#country
+countryData = dfE %>%
+  group_by(country) %>%
+  count(dfE$country) #do a count
+countryData = filter(countryData, n > 100) #filter only where greater than 100
+countryData = select(countryData, country, n) #select the correct cols
+barplot(countryData$n, main="Country",
+        names.arg = c("Australia", 'GB', "India", "Nigeria", "Unknown", "US")
+        , xlab = "Country"
+        , ylab="Count of Enrollments")
+#pie(countryData$n, labels = countryData$country, main="Enrollments by country greater than 10")
+
+#gender
+genderData = dfE %>%
+  group_by(gender) %>%
+  count(dfE$gender)
+genderData = select(genderData, gender, n)
+barplot(genderData$n, main="Gender",
+        names.arg = c("Female", 'Male', "Nonbinary", "Other", "Unknown")
+        , xlab = "Gender"
+        , ylab="Count of Enrollments")
+#pie(genderData$n, labels = genderData$gender, main="Enrollments by gender")
+
+#age range
+agerangeData = dfE %>%
+  group_by(age_range) %>%
+  count(dfE$age_range)
+agerangeData = select(agerangeData, age_range, n)
+barplot(agerangeData$n, main="Age Range",
+        names.arg = c("<18", ">65", "18-25", "26-35", "36-45", "46-55", "56-65","Unknown")
+        , xlab = "Age Range"
+        , ylab="Count of Enrollments")
+
+#highest_education_level
+highestEducationData = dfE %>%
+  group_by(highest_education_level) %>%
+  count(dfE$highest_education_level)
+highestEducationData = select(highestEducationData, highest_education_level, n)
+barplot(highestEducationData$n, main="Highest Education",
+        names.arg = c("Apprenticeship", "<Secondary", "Professional", "Secondary", "Tertiary", "Degree", "Doctrate", "Masters", "Unknown")
+        , xlab = "Highest Educational Level"
+        , ylab="Count of Enrollments")
+
+#employment area
+employmentareaData = dfE %>%
+  group_by(employment_area) %>%
+  count(dfE$employment_area)
+employmentareaData = select(employmentareaData, employment_area, n)
+barplot(employmentareaData$n, main="Employment Area",
+        names.arg = employmentareaData$employment_area
+        , xlab = "Employment Area"
+        , ylab="Count of Enrollments")
+
+#employment area
+employmentstatusData = dfE %>%
+  group_by(employment_status) %>%
+  count(dfE$employment_status)
+employmentstatusData = select(employmentstatusData, employment_status, n)
+barplot(employmentstatusData$n, main="Employment Status",
+        names.arg = employmentstatusData$employment_status
+        , xlab = "Employment Status"
+        , ylab="Count of Enrollments")
+
+par(mfrow=c(1,1))
+
+#leavers
+#last_completed_step is step
+nrow(dfLSR) #n items
+ncol(dfLSR) #p variables
+summary(dfLSR)
+table(dfLSR)
+plot.leavers()
+
+plot(table(dfLSR$last_completed_step))
+dfLSR = dfLSR %>% filter(!is.na(last_completed_step))
+
+#percentage complete
+ggplot(data = dfLSR, aes(x = last_completed_step)) +
+  geom_bar() +
+  labs(title= "Leavers by Last Completes Step", y="Count of Leavers", x = "Step Number") + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu") +
+  theme(axis.text.x = element_text(angle = 90))
+
+#reasons for leaving
+barplot(table(dfLSR$reason)
+        , main="Reasons for Leaving"
+        , xlab="Reason"
+        , ylab="Number of Leavers")
+
+#stage
+barplot(table(dfLSR$stage_id)
+        ,ylim=c(0,200)
+        , main="Leaving Surveys by Stage"
+        , xlab="Stage"
+        , ylab="Number of Leavers")
+
+
+
+
 #steps
 #step is a week_number.step_number relate to step
 nrow(dfSA) #n items
@@ -81,20 +186,6 @@ nrow(filter(dfSA, !is.na(dfSA$last_completed_at))) #complete stages 385558
 select(dfSA, stage_id, first_visited_at, last_completed_at, isComplete, timeToComplete) #check flag
 plot.steps()
 
-#leavers
-#last_completed_step is step
-nrow(dfLSR) #n items
-ncol(dfLSR) #p variables
-summary(dfLSR)
-table(dfLSR)
-plot.leavers()
-
-#compare leaver stage to step
-plot(dfLSR$last_completed_step, dfLSR$stage_id
-     , pch=16
-     , main="Comparison of Stage ID vs Last Completed Step"
-     , xlab="Step Number"
-     , ylab="Stage Number")
 
 
 #question response
