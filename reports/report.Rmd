@@ -121,7 +121,7 @@ It was identified that the vast majority of records for each property was "Unkno
 
 Related to the Enrollments data frame are Leaving Surveys and Step Activity. The leaving survey responses comprises of categorical, character and date based data regarding feedback from individuals which have left the course. The data frame has n=403 items and p=10 variables. The data frame has Learner_ID which can be used to relate to Enrollments as well as a "Last Complete Step" property with relates to the Activity Step data frame. This allows us to identify the step at which students leave the course, once the NA has been filtered out.
 
-```{r leaversByLastCompleteStep, echo=FALSE, out.width="100%", fig.cap="Leavers by Step of Course"}
+```{r leaversByLastCompleteStep, echo=FALSE, out.width="65%", fig.cap="Leavers by Step of Course"}
   dfLSR = dfLSR %>% filter(!is.na(last_completed_step))
   
   #percentage complete
@@ -133,9 +133,9 @@ Related to the Enrollments data frame are Leaving Surveys and Step Activity. The
     theme(axis.text.x = element_text(angle = 90))
 ```
 
-You can sere that most leave the course after step 3.20 which could potentially be investigated. Further investigation the reason for leaving had multiple categories referring to the lack of time so all reasons that mentioned time were grouped as one to make it comparable with the other reasons. This is shown in Figure 4.
+You can see that most leave the course after step 3.20 which could potentially be investigated. Further investigation the reason for leaving had multiple categories referring to the lack of time so all reasons that mentioned time were grouped as one to make it comparable with the other reasons. This is shown in Figure 4 below.
 
-```{r leaversByReason, echo=FALSE, out.width="100%", fig.cap="Leavers by Reason"}
+```{r leaversByReason, echo=FALSE, out.width="65%", fig.cap="Leavers by Reason"}
 
 barplot(table(dfLSR$reason)
         , main="Reasons for Leaving"
@@ -143,42 +143,46 @@ barplot(table(dfLSR$reason)
         , ylab="Count of Leavers")
   
 ```
+
 It can be seen that the principal reason for leaving is lack of time.
 
-The other related dataset to the enrollment data is the step activity data. This indicates the stage in the course that the related data occurred at. It is principally categorical data with n=423072 items and p=7 variables, although two more were subsequently added after feature engineeering. 
+The next related dataset to the enrollment data is the step activity data. This indicates the stage in the course that the related data occurred at. It is principally categorical data with n=423072 items and p=7 variables, although two more were subsequently added after feature engineeering. 
 
 The data includes the step number, the step start and end date with the learner_id. The end date has been used to indicate whether a step was complete for that student and how long the step took, this has resulted in 2 new columns - "isComplete" flag and "completedTime" in days, and allows us to calculate step completion stats and time scales per step as per below.
 
 ```{r stepActivityPlot, echo=FALSE, out.width="100%", fig.cap="Step Activity Exploration"}
-  par(mfrow=c(3,2))
 
-  #plot complete or not
-  barplot(table(dfSA$isComplete), ylim=c(0, 400000) 
-          , main="Total Completed Steps"
-          , xlab="Complete"
-          , ylab="Count of Activity Steps")
-  
-  boxplot(dfSA$step ~ dfSA$isComplete
-          , main="Activity vs Step Number"
-          , xlab="Complete"
-          , ylab="Step Number")
-  
-  boxplot(as.numeric(dfSA$timeToComplete) ~ as.numeric(substring(dfSA$step,1,3))
-          , main="Time to Complete by Step"
-          , xlab="Step"
-          , ylab="Number of days")
-  
-  barplot(table(dfSA$stage_id) 
-          , main="Total Completed Steps by Course Stage"
-          , xlab="Stage"
-          , ylab="Complete steps")
-  
-  boxplot(as.numeric(dfSA$timeToComplete) ~ dfSA$stage_id
-          , main="Time to Complete by Course Stage"
-          , xlab="Stage"
-          , ylab="Number of days")
-  
-  par(mfrow=c(1,1))
+par(mfrow=c(3,2))
+
+#plot complete or not
+barplot(table(dfSA$isComplete), ylim=c(0, 400000) 
+        , main="Total Completed Steps"
+        , xlab="Complete"
+        , ylab="Count of Activity Steps")
+
+boxplot(dfSA$step ~ dfSA$isComplete
+        , main="Activity vs Step Number"
+        , xlab="Complete"
+        , ylab="Step Number")
+
+boxplot(as.numeric(dfSA$timeToComplete) ~ as.numeric(substring(dfSA$step,1,3))
+        , main="Time to Complete by Step"
+        , xlab="Step"
+        , ylab="Number of days")
+
+barplot(table(dfSA$stage_id) 
+        , main="Total Completed Steps by Course Stage"
+        , xlab="Stage"
+        , ylab="Complete steps")
+
+boxplot(as.numeric(dfSA$timeToComplete) ~ dfSA$stage_id
+        , main="Time to Complete by Course Stage"
+        , xlab="Stage"
+        , ylab="Number of days")
+
+par(mfrow=c(1,1))
+
+
 ```
 
 We can see that there are far more completed steps than incomplete, and that incomplete steps are generally earlier in the course. However, there are still students who complete early steps and subsequently fail to complete later ones. There also indicates a wide spread of time to complete each step, with a variance of 103.1396. An outlier of this is *Step 2.8* which takes everyone very few days to complete.
@@ -189,61 +193,35 @@ The addition of the feature engineered values gives us the potential to use this
 
 Each step in the step activity data frame has associated quiz questions and responses. This is stored in the questions data frame. The question responses data is categorical data with n=176463 items and p=12 variables after the feature engineeering outlined below. The question responses table has the quiz question which includes the step number. Feature engineering was carried out to extract the correct step number and add it to a column, should there be a need to relate to the the activity steps.
 
-An examination of the data was carried out to look at the volume of responses and outcomes.
+An examination of the data was carried out to look at the volume of responses.
 
-```{r plotQuestionResponses, echo=FALSE, out.width="100%", fig.cap="Quiz Question Responses and Outcomes"}
+```{r plotQuestionResponses, echo=FALSE, out.width="65%", fig.cap="Quiz Question Responses"}
 
- par(mfrow=c(3,2))
-  
-  answerCount = dfQR %>%
-    group_by(quiz_question) %>%
-    count(dfQR$response)
-  answerCount = select(answerCount, quiz_question, n)
-  
-  #responses by question
-  barplot(answerCount$n
-          , main="Count of Responses by Question"
-          , xlab="Question"
-          , ylab="Count")
-  
-  answerCount = dfQR %>%
-    group_by(quiz_question) %>%
-    count(correct) 
-  
-  #correct answers
-  correctCount = filter(answerCount, correct==TRUE)
-  barplot(correctCount$n
-          , las=2
-          , main="Count of Correct Answer by Question"
-          , xlab="Question"
-          , ylab="Count")
-  
-  incorrectCount = filter(answerCount, correct==FALSE)
-  
-  #incorrect answers
-  barplot(incorrectCount$n
-          , las=2
-          , main="Count of Incorrect Answer by Question"
-          , xlab="Question"
-          , ylab="Count"
-          , cex.main=1, cex.lab=1, cex.axis=1)
-  par(mfrow=c(1,1))
+answerCount = dfQR %>%
+  group_by(quiz_question) %>%
+  count(dfQR$response)
+answerCount = select(answerCount, quiz_question, n)
+
+#responses by question
+barplot(answerCount$n
+        , main="Count of Responses by Question"
+        , xlab="Question"
+        , ylab="Count")
   
 ```
-We can see that step and week number generally match which indicates that step is related to week throughout the course. This also indicates that what I've called "stage" also indicates step and week number.
 
 As we can see there are significant differences in number of times each question was answered over the length of the course and the as expected mix of correct and incorrect answers. There is the potential here to look into the mix of correct and incorrect answers, potentially investigating any relationship between low attainment on the quizzes throughout the course to the student subsequently leaving.
 
-Each step in the step activity data frame also has associated vidro view data. The video stats data is multivariate data with n=65 items and p=29 variables. There are significantly more data variables in this relation then in those examined previously, and significantly less data items. 
+Each step in the step activity data frame also has associated video view data. The video stats data is multivariate data with n=65 items and p=29 variables. There are significantly more data variables in this relation then in those examined previously, and significantly less data items. 
 
 The data in this relation can be subsetted into data pertaining to percentage complete, type of device and location of the video view, so three data sets were created with just this data present. Some work was then done to convert the data from percentages to raw numbers, and then to pivot the result to allow some insights into the number of views.
 
 It can be seen below that the number of views which watched the whole video dropped off as they viewer got further through. For example we can see for the first video "1.1. Welcome to the course" that 1500 views completed 5% of the video, which drops to 1200 who completed 100%. This is then presented for each video throughout the course.
 
-```{r plotVideoStats, echo=FALSE, out.width="100%", fig.cap="Video View Completions"}
+```{r plotVideoStats, echo=FALSE, out.width="50%", fig.cap="Video View Completions"}
 
   #render number of views by percent complete
-  ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
+  ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
     geom_bar(stat="identity", position="dodge") +
     labs(title= "Views by Video Completion", y="Views", x = "Video") + 
     scale_fill_brewer(palette="PuBu", name="Viewed",
@@ -258,22 +236,23 @@ It can be seen that as the course progresses the volume of students engaging wit
 
 When viewing views by device it can be seen that no video was viewed on a tablet or TV, all views were by Console, Desktop or Mobile. It can be seen that by far the majority of views were on a Console throughout the length of the course, so it may be concluded the videos should be designed to play best on a console.
 
-```{r plotVideoDevice, echo=FALSE, out.width="100%", fig.cap="Video View by Device"}
+```{r plotVideoDevice, echo=FALSE, out.width="50%", fig.cap="Video View by Device"}
   #video by device
-  ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
+  ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
     geom_bar(stat="identity", position="dodge") +
     labs(title= "Views by Device", y="Views", x = "Video") + 
     theme_bw() + 
-    scale_fill_brewer(palette="PuBu", name="Device")+
+    scale_fill_brewer(palette="PuBu", name="Device") +
     theme(axis.text.x = element_text(angle = 90))
 ```
+
 The data shown reflects the same changes in the volume of use as shown above, i.e. that "1.5 Privacy online and offline" shows an increase in views in an otherwise downward trend.
 
 By viewing views by location it can be seen that the majority of views are from Europe with non at all from Antarctica and few from North America, Oceania and South America.
 
-```{r videoByLocation, echo=FALSE, out.width="100%", fig.cap="Video View by Location"}
+```{r videoByLocation, echo=FALSE, out.width="50%", fig.cap="Video View by Location"}
   #video by location
-  ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(title))) +
+  ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
     geom_bar(stat="identity", position="dodge") +
     labs(title= "Views by Location", y="Views", x = "Video") + 
     scale_fill_brewer(palette="PuBu", name="Location") +
@@ -288,7 +267,7 @@ The final data frame related to the course stage is the weekly sentiment data, t
 
 As we can see from the weekly experience data below, across the three weeks of the course the total sentiment data provided by the student cohort went down from 73 to 45, although the experience ratings being provided remained consistent at approximately 90% providing a rating of 3.
 
-```{r plotSentimentAnalysis, echo=FALSE, out.width="100%", fig.cap="Sentiment Completions"}
+```{r plotSentimentAnalysis, echo=FALSE, out.width="65%", fig.cap="Sentiment Completions"}
 
 ggplot(dfSS, aes(x=week_number, fill=factor(experience_rating))) + 
   geom_bar(position="stack") +
@@ -300,11 +279,10 @@ ggplot(dfSS, aes(x=week_number, fill=factor(experience_rating))) +
 It would be of value to understand this data as a percentage of the total patient cohort. Given the lack of a "learner_id" in this data it isn't immediately possible to relate the sentiments back to a specific learner, so this data could only be looked into by step. There may be value in understanding after which step students decided to stop providing feedback, this could be related on the "stage_id".
 
 ### 3 Conclusion and Hypothesis
-Some narrative here.
-Test performance vs video views, devices or location
-Leavers vs test performance
-Leavers vs location
-Sentiment vs Step.
+There is a wide breath of data in the data set regarding activity throughout the course, and richness is provided by the video views data frame which includes data such as the device used, location of the student and so forth. The use of the step dataset allows us to investigate the stage of the course which events happened, and the leavers dataset allows us to look into leavers. Knowing that the location work has been completed previously by other students, I feel that there is enough data to investigate something around student performance, stage and the decision to leave.
+
+I hyptothesise that the lower completion of videos and lower weekly sentiment scores increase the chances of a student choosing to leave the course. This will be investigated in iteration 2 of the CRISP-DM model.
+
 
 #### Iteration 2 Hypothesis
 Test performance vs video views vs leavers

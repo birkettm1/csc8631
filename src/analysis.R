@@ -186,6 +186,35 @@ nrow(filter(dfSA, !is.na(dfSA$last_completed_at))) #complete stages 385558
 select(dfSA, stage_id, first_visited_at, last_completed_at, isComplete, timeToComplete) #check flag
 plot.steps()
 
+par(mfrow=c(3,2))
+
+#plot complete or not
+barplot(table(dfSA$isComplete), ylim=c(0, 400000) 
+        , main="Total Completed Steps"
+        , xlab="Complete"
+        , ylab="Count of Activity Steps")
+
+boxplot(dfSA$step ~ dfSA$isComplete
+        , main="Activity vs Step Number"
+        , xlab="Complete"
+        , ylab="Step Number")
+
+boxplot(as.numeric(dfSA$timeToComplete) ~ as.numeric(substring(dfSA$step,1,3))
+        , main="Time to Complete by Step"
+        , xlab="Step"
+        , ylab="Number of days")
+
+barplot(table(dfSA$stage_id) 
+        , main="Total Completed Steps by Course Stage"
+        , xlab="Stage"
+        , ylab="Complete steps")
+
+boxplot(as.numeric(dfSA$timeToComplete) ~ dfSA$stage_id
+        , main="Time to Complete by Course Stage"
+        , xlab="Stage"
+        , ylab="Number of days")
+
+par(mfrow=c(1,1))
 
 
 #question response
@@ -204,16 +233,7 @@ hist(dfQR$week_number)
 hist(as.numeric(dfQR$step))
 barplot(dfQR$step_number)
 
-
 par(mfrow=c(3,2))
-plot(dfQR$week_number, dfQR$step     
-     , pch=16
-     , main="Comparison of Step vs Week Number"
-     , xlab="Week Number"
-     , ylab="Step Number")
-
-#hist(dfQR$response)
-#boxplot(dfQR$question_number ~ dfQR$correct)
 
 answerCount = dfQR %>%
   group_by(quiz_question) %>%
