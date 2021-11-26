@@ -1,9 +1,5 @@
 #load some libraries
 library('ProjectTemplate'); 
-#library(dplyr)
-#library(readr)
-#library(DiagrammeR)
-
 #load the project
 load.project()
 
@@ -35,31 +31,16 @@ create.erd.flowchart()
 
 #(Visualise > Model > Transform) 
 
-#location analysis
-#mean(as.numeric(dfSA$timeToComplete),na.rm=TRUE)
-#median(as.numeric(dfSA$timeToComplete),na.rm=TRUE)
-#table(dfSA$timeToComplete) #- create a frequency table of occurrences of data, use with categories / factors
-#range(as.numeric(dfSA$timeToComplete),na.rm=TRUE) #- get the lowest and highest value
-#sd(as.numeric(dfSA$timeToComplete),na.rm=TRUE) #- standard deviation
-#var(as.numeric(dfSA$timeToComplete),na.rm=TRUE) #- variance
-#quantile(as.numeric(dfSA$timeToComplete),na.rm=TRUE) #- quantile values at 25, 50, 75, 100%
-
-#graphical analysis
 #2 data sources
-#plot(movies$length, movies$rating) 
+plot(movies$length, movies$rating)
 #categorical
-#barplot(table(categorical)) #continuous data
+barplot(table(categorical))
 #continuous
-#hist(continuous) #distribution of a value
-#boxplot(continuous ~ categorical) #continuous vs a categorical
-#pairs(data[,colNumbers]) #continuous vs continuous
+hist(continuous)
+boxplot(continuous ~ categorical)
 
-summary(dfTM)
-
-#enrollments - people
+#Enrollments
 summary(dfE)
-nrow(dfE) #n items
-ncol(dfE) #p variables
 table(dfE$gender)
 barplot(table(dfE$gender))
 barplot(table(dfE$age_range))
@@ -68,7 +49,8 @@ barplot(table(dfE$highest_education_level))
 barplot(table(dfE$employment_area))
 barplot(table(dfE$employment_status))
 barplot(table(dfE$detected_country))
-plot.enrollments()
+barplot(table(dfE$enrolled_at))
+barplot(table(dfE$unenrolled_at))
 
 par(mfrow=c(2,3))
 #graph the enrollment data
@@ -138,239 +120,62 @@ barplot(employmentstatusData$n, main="Employment Status",
 
 par(mfrow=c(1,1))
 
-#leavers
-#last_completed_step is step
-nrow(dfLSR) #n items
-ncol(dfLSR) #p variables
+#Leaving Surveys
+summary(dfSA)
 summary(dfLSR)
-table(dfLSR)
-plot.leavers()
-
-plot(table(dfLSR$last_completed_step))
 dfLSR = dfLSR %>% filter(!is.na(last_completed_step))
+select(dfLSR, last_completed_step, last_completed_step_number, 
+       last_completed_week_number)[1:5,]
+
+table(dfLSR)
+leavers = left_join(dfLSR, dfSA, by = c("last_completed_step" = "step_position"), 
+                    copy = FALSE, suffix = c(".dfLSR", ".dfSA"), keep = TRUE,
+                    na_matched = "na")
+
+leavers = dfLSR %>% left_join(dfSA, by=c("last_completed_step"="step_position")) 
+
+barplot(table(dfLSR$last_completed_step))
+barplot(table(dfSA$step_position))
+barplot(table(dfLSR$last_completed_step_number))
+barplot(table(dfLSR$last_completed_week_number))
+
+
+barplot(table(dfLSR$reason)
+        , main="Reasons for Leaving"
+        , xlab="Reason"
+        , ylab="Count of Leavers")
 
 #percentage complete
 ggplot(data = dfLSR, aes(x = last_completed_step)) +
   geom_bar() +
-  labs(title= "Leavers by Last Completes Step", y="Count of Leavers", x = "Step Number") + 
+  labs(y="Count of Leavers", x = "Step Number") + 
   theme_bw() + 
   scale_fill_brewer(palette="PuBu") +
   theme(axis.text.x = element_text(angle = 90))
 
-#reasons for leaving
-barplot(table(dfLSR$reason)
-        , main="Reasons for Leaving"
-        , xlab="Reason"
-        , ylab="Number of Leavers")
 
-#stage
-barplot(table(dfLSR$stage_id)
-        ,ylim=c(0,200)
-        , main="Leaving Surveys by Stage"
-        , xlab="Stage"
-        , ylab="Number of Leavers")
+#step activity
+summary(dfSA)
 
-
-
-
-#steps
-#step is a week_number.step_number relate to step
-nrow(dfSA) #n items
-ncol(dfSA) #p variables
-table(dfSA)
-dfSA = filter(dfSA, step == 1.1)
-
-#identify complete or incomplete
-nrow(filter(dfSA, is.na(dfSA$last_completed_at))) #incomplete stages 37514
-nrow(filter(dfSA, !is.na(dfSA$last_completed_at))) #complete stages 385558
-select(dfSA, stage_id, first_visited_at, last_completed_at, isComplete, timeToComplete) #check flag
-plot.steps()
-
-par(mfrow=c(3,2))
-
-#plot complete or not
-barplot(table(dfSA$isComplete), ylim=c(0, 400000) 
-        , main="Total Completed Steps"
-        , xlab="Complete"
-        , ylab="Count of Activity Steps")
-
-boxplot(dfSA$step ~ dfSA$isComplete
-        , main="Activity vs Step Number"
-        , xlab="Complete"
-        , ylab="Step Number")
-
-boxplot(as.numeric(dfSA$timeToComplete) ~ as.numeric(substring(dfSA$step,1,3))
-        , main="Time to Complete by Step"
-        , xlab="Step"
-        , ylab="Number of days")
-
-barplot(table(dfSA$stage_id) 
-        , main="Total Completed Steps by Course Stage"
-        , xlab="Stage"
-        , ylab="Complete steps")
-
-boxplot(as.numeric(dfSA$timeToComplete) ~ dfSA$stage_id
-        , main="Time to Complete by Course Stage"
-        , xlab="Stage"
-        , ylab="Number of days")
-
-par(mfrow=c(1,1))
-
-
-#question response
-nrow(dfQR) #n items
-ncol(dfQR) #p variables
-#quiz_question is week_number.step_number.question_number
+#something about results - relate back to dfSA
 summary(dfQR)
-table(dfQR$step_number) 
-table(dfQR$step)
 table(dfQR$quiz_question) 
 table(dfQR$week_number) 
-
+table(dfQR$step_number) 
 barplot(table(dfQR$correct))
-pairs(dfQR[,4:5])
-hist(dfQR$week_number)
-hist(as.numeric(dfQR$step))
-barplot(dfQR$step_number)
-
-par(mfrow=c(3,2))
-
-answerCount = dfQR %>%
-  group_by(quiz_question) %>%
-  count(dfQR$response)
-answerCount = select(answerCount, quiz_question, n)
-
-#responses by question
-barplot(answerCount$n
-        , main="Count of Responses by Question"
-        , xlab="Question"
-        , ylab="Count")
-
-answerCount = dfQR %>%
-  group_by(quiz_question) %>%
-  count(correct) 
-
-#correct answers
-correctCount = filter(answerCount, correct==TRUE)
-barplot(correctCount$n
-        , las=2
-        , main="Count of Correct Answer by Question"
-        , xlab="Question"
-        , ylab="Count")
-
-incorrectCount = filter(answerCount, correct==FALSE)
-
-#incorrect answers
-barplot(incorrectCount$n
-        , las=2
-        , main="Count of Incorrect Answer by Question"
-        , xlab="Question"
-        , ylab="Count"
-        , cex.main=1, cex.lab=1, cex.axis=1)
-par(mfrow=c(1,1))
 
 
-#video stats
-nrow(dfVS) #n items
-ncol(dfVS) #p variables
+
+#some about video stats
 summary(dfVS)
 barplot(table(dfVS$total_transcript_views))
 barplot(table(dfVS$viewed_five_percent))
 barplot(table(dfVS$viewed_onehundred_percent))
-dfVS$id
-
-#totals
-summary(dfVSTotals)
-
-#par(mfrow=c(3,3))
-#hist(dfVSTotals$total_views)
-#hist(dfVSTotals$viewed_five_percent)
-#hist(dfVSTotals$viewed_ten_percent)
-#hist(dfVSTotals$viewed_twentyfive_percent)
-#hist(dfVSTotals$viewed_fifty_percent)
-#hist(dfVSTotals$viewed_seventyfive_percent)
-#hist(dfVSTotals$viewed_ninetyfive_percent)
-#hist(dfVSTotals$viewed_onehundred_percent)
-#par(mfrow=c(1,1))
-#pairs(dfVSTotals[,3:10])
-
-#export
-#write.csv(dfVSTotals,"c:\\temp\\viewtotals.csv", row.names = FALSE)
-
-#manual pivot
-summary(dfVSTotals)
-#dfVSTotalsPivot = dfVSTotals %>% 
-#  pivot_longer(!(1:2), names_to = "percentviewed", values_to = "count")
-#dfVSTotalsPivot$title = paste(dfVSTotalsPivot$step_position, dfVSTotalsPivot$title, pos=" ")
-
-
-vid1 = ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
-  geom_bar(stat="identity", position="dodge") +
-  labs(title= "Views by Video Completion", y="Views", x = "Video") + 
-  scale_fill_brewer(palette="PuBu", name="Viewed",
-                    breaks=c("05", "10", "25" ,"50","75","95", "99"),
-                    labels=c("5%", "10%", "25%" ,"50%","75%","95%", "100%")) +
-  theme_bw() + 
-  theme(axis.text.x = element_text(angle = 90))
-
-#video by device
-vid2 = ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
-  geom_bar(stat="identity", position="dodge") +
-  labs(title= "Views by Device", y="Views", x = "Video") + 
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu", name="Device") +
-  theme(axis.text.x = element_text(angle = 90))
-
-#video by location
-vid3 = ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
-  geom_bar(stat="identity", position="dodge") +
-  labs(title= "Views by Location", y="Views", x = "Video") + 
-  scale_fill_brewer(palette="PuBu", name="Location") +
-  theme_bw() + 
-  theme(axis.text.x = element_text(angle = 90))
-
-grid.arrange(vid1, vid2, vid3, ncol=2, nrow=2)
-
-
 
 #something about sentiment - relate back via week_number
-nrow(dfSS) #n items
-ncol(dfSS) #p variables
 summary(dfSS)
 table(dfSS$reason)
 count(dfSS, reason)
-#experience_rating categorical, reason string
-barplot(table(dfSS$experience_rating)
-        , main="Weekly Experience Rating"
-        , xlab="Rating"
-        , ylab="Count")
-table(dfSS$experience_rating)
-table(dfSS$week_number)
-hist(dfSS$experience_rating)
-select(dfSS, id, experience_rating, week_number)
-typeof(dfSS$week_number)
-
-ggplot(data = dfSS, aes(y = experience_rating, x = week_number )) +
-  geom_bar(stat="identity") +
-  labs(title= "Weekly Experience Rating", y="Experience Rating", x = "Week Number") + 
-  scale_fill_brewer(palette="PuBu", name="Location")
-
-ggplot(data = dfSS, aes(fill = experience_rating, x = week_number, y=experience_rating)) + 
-  geom_bar(stat="identity", position = "dodge")
-
-ggplot(dfSS, aes(x = experience_rating, fill = week_number )) + 
-  geom_bar(position = "stack")
-
-barplot(table(dfSS$week_number)
-        , main="Weekly Experience Rating"
-        , xlab="Week"
-        , ylab="Count")
-
-ggplot(dfSS, aes(x=week_number, fill=factor(experience_rating))) + 
-  geom_bar(position="stack") +
-  labs(title= "Weekly Experience Rating", y="Count", x = "Week Number") +
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu", name="Experience Rating")
 
 #Understand 
 

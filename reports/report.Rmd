@@ -14,137 +14,160 @@ knitr::opts_knit$set(root.dir=normalizePath('..'))
 library(ProjectTemplate); load.project()
 ```
 
-## CSC 8631 - Data Investigation with Student Data
+## CSC 8631 - Data Management and Exploratory Data Analysis
+An investigation into an MDOC dataset using a CRISP-DM model. The model is the industry standard approach to data mining projects, it has six phases and is iterative. It is described as a "set of guardrails to help you plan organise and implement your data science (or machine learning) project."(Data Science Alliance, 2021).
 
-### Introduction
-This report is an investigation of Student Data using the CRISP-DM model. The model is iterative and so this report covers two iterations, including the processes of Business Understanding, Data Understanding, Data Preparation. The subprocesses I've chosen are to do the following steps: 
+The phases and tasks of a CRISP-DM project are outlined by the Data Science Alliance as per:
 
-* Import
-* Tidy
-* Visualise
-* Understand 
-* Communicate
+1. Business Understanding - what does the business need?
+  + Understand the business objective. What does the customer want to accomplish? 
+  + Assess the situation. Determine resource availability, requirements, risks and contingencies
+  + Data Mining Goals - what does success look like?
+  
+2. Data Understanding - what data do we have / need? Identify, collect and analyse.
+  + Collect the initial data, aquire and load into data analysis tool.
+  + Describe the data, examine and document properties such as data format, number of records and identities
+  + Explore the data, query and visualise and idetntify the relationships.
+  + Verify the data quality and document any issues.
+  
+3. Data Preparation - prepare the final datasets for modelling.
+  + Determine which data set to be used and reasons for inclusion / exlusion.
+  + Clean the data
+  + Construct data, carry out any required feature engineering.
+  + Integrate data, create new datasets by combining data sources
+  + Re-format data as necessary, cast data types as required.
 
-The project has been set up using ProjectTemplate to provide structure and repeatability, which will be tested on a regular basis. Version control is provided by Git and this report created with R Markdown. Various libraries have been imported and used from the Tidyverse regarding data import and management (Dplyr, Readr) and visualisation (GGPlot2).
+4. Modelling - what modelling techniques should we apply?
+  + Determine which models to try.
+  + Design tests.
+  + Build and assess the model.
+  
+5. Evaluation - which model best meets the business objectives?
+  + Evaluate the models against the business success criteria identified in step 1.
+  + Review the processes, was anything overlooked and everything properly executed?
+  + Determine next steps, what do we need to do to deploy.
+ 
+6. Deployment - how do stakeholders access the results?
+  + Plan deployment, document.
+  + Plan monitoring and maintenance.
+  + Produce the final report.
 
-## Iteration 1
-Iteration 1 was be used to investigate the data and generate a hypothesis for further investigation going through the steps outlined above. Once a hypothesis has been identified this will be further investigated in iteration 2. An initial investigation into each relation in the dataset will be carried out and a graphical summary will be presented with potential hypothesis and further analysis will be carried out on iteration 2. Once we have a working hypothesis summary statistics of the specific data to be used will be presented. 
+This report will cover the first three steps of this model and a minimum of two iterations. I will attempt to implement all of the associated tasks. With the lack of formal requirements provided by the assignment it will be difficult to define a business need in the first iteration of the model therefore tasks such as defining the business objective and data mining goals will be defined for the second iteration as a result of the first. So, each therefore the two iterations of the model will be:
 
-### 1 - Import, Tidy
-The data was supplied in csv files covering 8 different areas of the software over multiple stages, this was imported into R into 8 data frames from the original for easier analysis. The number of the file was included to give an indication of which stage of the course the data was created which will potentially provide an indication of time for further analysis. Upon initial import is was found that the detected data types were not consistent and so the import_csv functionality in ReadR was used, which allowed me to dynamically set the property type on import. Particularly any ID property was set to be an integer and Date time properties we converted to the local POSIX time format.
+1. Iteration 1
+  + Data Understanding
+  + Data Preparation
+  
+2. Iteration 2
+  + Business Understanding - define and understand the hypothesis from Iteration 1.
+  + Data Understanding
+  + Data Preparation.
 
-As a first step, once the data had been imported i reviewed the summary of each dataframe and created an Entity Relationship Diagram (ERD) as shown in figure 1, using a package called DiagrammR. Unfortunately this hasn't allowed me to put the detail of each relationship on.
+The investigative project will be completed in R using R Studio and has been set up using ProjectTemplate to provide structure and repeatability. Version control is provided by Git and this report created with R Markdown. Various libraries have been imported and used from the Tidyverse regarding data import and management (Dplyr, Readr) and visualisation (GGPlot2).
+
+### Iteration 1
+A first iteration completing the understanding and preparation step will be carried out. The Future Learn MDOC dataset was downloaded as a zip file and reviewed. The data was supplied in csv files covering 8 different areas of the software over multiple stages, this was imported into R into 8 data frames from the original for easier analysis. The data was then reviewed.
+
+#### Step 2: Data Understanding
+
+Upon initial import is was found that the detected data types were not consistent and so his was dynamically set on import. Particularly any ID property was set to be an integer and date time properties we converted to the local POSIX time format. 
+
+Upon investigation it was decided that some data would be disregarded due to lack of breath. Therefore, we have data covering the life cycle of a student including:
+
+<!-- 
+Describe the data, examine and document properties such as data format, number of records and identities.
+Explore the data, query and visualise and identify the relationships.
+Verify the data quality and document any issues.
+-->
+
+* **Enrollments**. Enrollment is a categorical dataset with n=37296 items and p=14 variables. It was found that the majority of data for all properties was "unknown" and therefore not suitable for further analysis. 
+
+  * **Primary Key** - "Learner_ID" of character data type.
+  
+  * **Fields and format** - Properties include Country, Gender, Age Range, Highest Education Achieved, Employment Area and Employment Status, Role all of type character. Also date / time of enrolled, un-enrolled, fully participated and purchased statements.
+  
+  * **Related data sets** - Team Member, Leaving Survey and Step Activity can be related on Learner_ID
+  
+  * **Data Quality** - The data types across date times in multiple files were inconsistent and therefore they were cast on import. The vast majority of data for each categorical value is "Unknown". We don't have enough data to analyse.
+
+
+* **Leaving Survey**. The leaving survey responses comprises of categorical, character and date based data regarding feedback from individuals which have left the course. The data frame has n=403 items and p=10 variables. The primary key of this table is ID which was cast to an integer in the import process.
+
+  * **Primary Key** - "ID" which was cast to integer during import.
+  
+  * **Fields and format** - "ID" as integer, "Learner_ID" as character, "Left_at" as datetime, the date and time a student left the course, "leaving_reason" as characters, "last_completed_step" as character and "last_completed_step" as as date time, also the "last_completed_week_number" and "last_completed_step_number".
+  
+  * **Related data sets** - Enrollments on "Learner_ID". Investigation into the key fields of "last_completed_step", "last_completed_step_number" and "last_completed_week_number" revealed that "last_completed_step" was a concatenation of the other two fields and could be used to relate to the Step Activity data. This allows the identification of the stage that students leave the course. This can be seen in Figure 1.
+  
+  ```{r enrollmentsToStep, echo=FALSE, out.width="65%", fig.cap="Enrollment to Step Activity Keys"}
+  dfLSR = dfLSR %>% filter(!is.na(last_completed_step))
+  select(dfLSR, last_completed_step, last_completed_step_number, 
+       last_completed_week_number)[1:5,]
+  ```
+  
+  * **Data Quality** - Upon import it was necessary to standardise the data type across multiple files, id was cast to integer, last completed step to character and the last completed step and week numbers to integer. All date times were also cast to date time. Upon investigation of the data it was found that there were multiple leaving reasons which amounted to "lack of time", this field was merged to make it comparable to other values. 
+  
+  
+* **Step Activity**. This indicates the stage in the course that the related data occurred at. It is principally categorical data with n=423072 items and p=6 variables.
+  * **Primary Key** - A compound key of "Learner_ID" of character data type and step (integer). This identifies data about the step the student was at.
+  * **Fields and format** - "Learner_ID" of type character, "week_number" and "step_number" both of which are integer and "step" which is also an integer and is a concatenation of the two. First_Visited_At and "Last_Completed_At" are both date times and indicate when the student was at that stage.
+  * **Related data sets** - Enrollments via "Learner ID", Question Response, Video Stats and Sentiment Survey via Step.
+  * **Data Quality** - Data types were consistent across the files to be imported. Date times were cast on import.
+  
+  
+  
+  
+* **Question Responses**. Each step in the step activity data frame has associated quiz questions and responses. This is stored in the questions data frame. The question responses data is categorical data with n=176463 items and p=10 variables.
+  * **Primary Key** - "Learner_ID" of character data type.
+  * **Fields and format** - 
+  * **Related data sets** - 
+  * **Data Quality** - 
+  
+* **Video Views**. Each step in the step activity data frame also has associated video view data. The video stats data is multivariate data with n=65 items and p=29 variables. There are significantly more data variables in this relation then in those examined previously, and significantly less data items. 
+  * **Primary Key** - 
+  * **Fields and format** - 
+  * **Related data sets** - 
+  * **Data Quality** - 
+
+* **Weekly Sentiments**. This is completed by each student per week. The sentiment data has n=181 items and p=6 variables. This table has a categorical properly rating and character data to cover the sentiment. I will not be looking to cover sentiment analysis in this work so only the categorical value will be looked at. 
+  * **Primary Key** - "ID" has been cast to integer during the import process
+  * **Fields and format** - 
+  * **Related data sets** - 
+  * **Data Quality** - 
+
+The relationships between data sets were documented as per Figure 1.
 
 ![Relationships between data frames.](erd.png "Entity Relationship Diagram"){width=75%}
 
-It was found that some table had primary keys called ID (Archetype, Leaving Survey Responses, Sentiment Survey,) Learner_ID (Enrollments, Question Responses, Step Activity, Team Member ) or Step_Position (Video Stats). It was regarded that these would be the candidate keys for the initial investigation in Iteration 1. The data regarding video views was video centric and did not have Learner ID nor did the sentiment survey data. 
+#### Data Preparation
+3. Data Preparation - prepare the final datasets for modelling.
+  * Determine which data set to be used and reasons for inclusion / exclusion.
+  * Clean the data
+  * Construct data, carry out any required feature engineering.
+  * Integrate data, create new datasets by combining data sources
+  * Re-format data as necessary, cast data types as required.
+  
+  
+### Iteration 2
 
-Upon investigation of the data it was decided that further investigation of Enrollments, Step Activity, Leaving Survey Responses, Question Response, Video Stats and Weekly Sentiment Surveys may yield an interesting topic for investigation. The other data was dismissed due to its limited breath. The Team Member dataframe would allow getting a students name if required, however, this has been blanked out in this dataset as per Information Governance laws.
+#### Business Understanding - Hypothesis
 
-### 2 Visualise and Understanding
-Each data frame was investigated with a combination of viewing the data, frequency tables and graphical analysis. Each table identified above will be visualised and some conclusions regarding potential investigation drawn. A comment will be provided on the contents of each table in terms or items, variables and variable types, namely continuous and categorical. Appropriate visualisations for the variable types will be selected. Also an outline of any feature engineering (i.e. the derivation of new data items) carried out will be included. The investigation will follow the order of the ERD in figure 1 and start with Enrollments, then Leaving Survey and Step Activity, then consider the layer below that.
+#### Data Understanding
 
-The enrollments dataset is a categorical dataset with n=37296 items and p=14 variables. For each variable bar plots were used to visualise the spread of values of the data. The properties investigated were Country, Gender, Age Range, Highest Education Achieved, Employment Area and Employment Status. The data set was grouped by each variable in turn and a then the enrollments counted. Specifically for the country visualisation, the dataset was filtered to only return those with more than 100 enrollments. The output for each property can be seen in Figure 2.
+#### Data Preparation
 
-```{r enrollmentPlots, echo=FALSE, out.width="100%", fig.cap="Enrollment data frequency by property"}
+### Conclusions
 
-par(mfrow=c(2,3))
-#graph the enrollment data
+### References
+Data Science Alliance, 2021, What is CRISP-DM, https://www.datascience-pm.com/crisp-dm-2/, Accessed: 26/11/2021
 
-#country
-countryData = dfE %>%
-  group_by(country) %>%
-  count(dfE$country) #do a count
-countryData = filter(countryData, n > 100) #filter only where greater than 100
-countryData = select(countryData, country, n) #select the correct cols
-barplot(countryData$n, main="Country",
-        names.arg = c("Australia", 'GB', "India", "Nigeria", "Unknown", "US")
-        , xlab = "Country"
-        , ylab="Count of Enrollments")
-#pie(countryData$n, labels = countryData$country, main="Enrollments by country greater than 10")
-
-#gender
-genderData = dfE %>%
-  group_by(gender) %>%
-  count(dfE$gender)
-genderData = select(genderData, gender, n)
-barplot(genderData$n, main="Gender",
-        names.arg = c("Female", 'Male', "Nonbinary", "Other", "Unknown")
-        , xlab = "Gender"
-        , ylab="Count of Enrollments")
-#pie(genderData$n, labels = genderData$gender, main="Enrollments by gender")
-
-#age range
-agerangeData = dfE %>%
-  group_by(age_range) %>%
-  count(dfE$age_range)
-agerangeData = select(agerangeData, age_range, n)
-barplot(agerangeData$n, main="Age Range",
-        names.arg = c("<18", ">65", "18-25", "26-35", "36-45", "46-55", "56-65","Unknown")
-        , xlab = "Age Range"
-        , ylab="Count of Enrollments")
-
-#highest_education_level
-highestEducationData = dfE %>%
-  group_by(highest_education_level) %>%
-  count(dfE$highest_education_level)
-highestEducationData = select(highestEducationData, highest_education_level, n)
-barplot(highestEducationData$n, main="Highest Education",
-        names.arg = c("Apprenticeship", "<Secondary", "Professional", "Secondary", "Tertiary", "Degree", "Doctrate", "Masters", "Unknown")
-        , xlab = "Highest Educational Level"
-        , ylab="Count of Enrollments")
-
-#employment area
-employmentareaData = dfE %>%
-  group_by(employment_area) %>%
-  count(dfE$employment_area)
-employmentareaData = select(employmentareaData, employment_area, n)
-barplot(employmentareaData$n, main="Employment Area",
-        names.arg = employmentareaData$employment_area
-        , xlab = "Employment Area"
-        , ylab="Count of Enrollments")
-
-#employment area
-employmentstatusData = dfE %>%
-  group_by(employment_status) %>%
-  count(dfE$employment_status)
-employmentstatusData = select(employmentstatusData, employment_status, n)
-barplot(employmentstatusData$n, main="Employment Status",
-        names.arg = employmentstatusData$employment_status
-        , xlab = "Employment Status"
-        , ylab="Count of Enrollments")
-
-par(mfrow=c(1,1))
- 
-```
-It was identified that the vast majority of records for each property was "Unknown", therefore there isn't the scope of data to support an investigation. Potentially this is an avenue to improve data completeness in future enrollments.
-
-Related to the Enrollments data frame are Leaving Surveys and Step Activity. The leaving survey responses comprises of categorical, character and date based data regarding feedback from individuals which have left the course. The data frame has n=403 items and p=10 variables. The data frame has Learner_ID which can be used to relate to Enrollments as well as a "Last Complete Step" property with relates to the Activity Step data frame. This allows us to identify the step at which students leave the course, once the NA has been filtered out.
 
 ```{r leaversByLastCompleteStep, echo=FALSE, out.width="65%", fig.cap="Leavers by Step of Course"}
-  dfLSR = dfLSR %>% filter(!is.na(last_completed_step))
-  
-  #percentage complete
-  ggplot(data = dfLSR, aes(x = last_completed_step)) +
-    geom_bar() +
-    labs(y="Count of Leavers", x = "Step Number") + 
-    theme_bw() + 
-    scale_fill_brewer(palette="PuBu") +
-    theme(axis.text.x = element_text(angle = 90))
+
 ```
 
-You can see that most leave the course after step 3.20 which could potentially be investigated. Further investigation the reason for leaving had multiple categories referring to the lack of time so all reasons that mentioned time were grouped as one to make it comparable with the other reasons. This is shown in Figure 4 below.
 
-```{r leaversByReason, echo=FALSE, out.width="65%", fig.cap="Leavers by Reason"}
 
-barplot(table(dfLSR$reason)
-        , main="Reasons for Leaving"
-        , xlab="Reason"
-        , ylab="Count of Leavers")
-  
-```
-
-It can be seen that the principal reason for leaving is lack of time.
 
 The next related dataset to the enrollment data is the step activity data. This indicates the stage in the course that the related data occurred at. It is principally categorical data with n=423072 items and p=7 variables, although two more were subsequently added after feature engineeering. 
 
@@ -292,7 +315,8 @@ To answer the hypothesis XYZ the findings are that ABC
 
 ## Conclusion
 
-## References
+
+
 ReadR - https://readr.tidyverse.org/index.html
 DiagrammeR - https://rich-iannone.github.io/DiagrammeR/
 Working with categorical data - https://cran.r-project.org/web/packages/vcdExtra/vignettes/vcd-tutorial.pdf 
