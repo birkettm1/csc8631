@@ -97,7 +97,7 @@ Verify the data quality and document any issues.
   
   * **Fields and format** - "ID" as integer, "Learner_ID" as character, "Left_at" as datetime, the date and time a student left the course, "leaving_reason" as characters, "last_completed_step" as character and "last_completed_step" as as date time, also the "last_completed_week_number" and "last_completed_step_number".
   
-  * **Related data sets** - Enrollments on "Learner_ID". Investigation into the key fields of "last_completed_step", "last_completed_step_number" and "last_completed_week_number" revealed that "last_completed_step" was a concatenation of the other two fields and could be used to relate to the Step Activity data. This allows the identification of the stage that students leave the course. This can be seen in Figure 1.
+  * **Related data sets** - Enrollments on "Learner_ID". Investigation into the key fields of "last_completed_step", "last_completed_step_number" and "last_completed_week_number" revealed that "last_completed_step" was a concatenation of the other two fields and could be used to relate to the Step Activity data. This allows the identification of the stage that students leave the course. This can be seen below.
   
   ```{r enrollmentsToStep, echo=FALSE, out.width="65%", fig.cap="Enrollment to Step Activity Keys"}
   dfLSR = dfLSR %>% filter(!is.na(last_completed_step))
@@ -148,6 +148,9 @@ The relationships between data sets were documented as per Figure 1.
   * Re-format data as necessary, cast data types as required.
   
   
+<!-- Step activity feature engineering
+The data includes the step number, the step start and end date with the learner_id. The end date has been used to indicate whether a step was complete for that student and how long the step took, this has resulted in 2 new columns - "isComplete" flag and "completedTime" in days, and allows us to calculate step completion stats and time scales per step as per below. -->
+
 ### Iteration 2
 
 #### Business Understanding - Hypothesis
@@ -163,48 +166,6 @@ Data Science Alliance, 2021, What is CRISP-DM, https://www.datascience-pm.com/cr
 
 
 ```{r leaversByLastCompleteStep, echo=FALSE, out.width="65%", fig.cap="Leavers by Step of Course"}
-
-```
-
-
-
-
-The next related dataset to the enrollment data is the step activity data. This indicates the stage in the course that the related data occurred at. It is principally categorical data with n=423072 items and p=7 variables, although two more were subsequently added after feature engineeering. 
-
-The data includes the step number, the step start and end date with the learner_id. The end date has been used to indicate whether a step was complete for that student and how long the step took, this has resulted in 2 new columns - "isComplete" flag and "completedTime" in days, and allows us to calculate step completion stats and time scales per step as per below.
-
-```{r stepActivityPlot, echo=FALSE, out.width="100%", fig.cap="Step Activity Exploration"}
-
-par(mfrow=c(3,2))
-
-#plot complete or not
-barplot(table(dfSA$isComplete), ylim=c(0, 400000) 
-        , main="Total Completed Steps"
-        , xlab="Complete"
-        , ylab="Count of Activity Steps")
-
-boxplot(dfSA$step ~ dfSA$isComplete
-        , main="Activity vs Step Number"
-        , xlab="Complete"
-        , ylab="Step Number")
-
-boxplot(as.numeric(dfSA$timeToComplete) ~ as.numeric(substring(dfSA$step,1,3))
-        , main="Time to Complete by Step"
-        , xlab="Step"
-        , ylab="Number of days")
-
-barplot(table(dfSA$stage_id) 
-        , main="Total Completed Steps by Course Stage"
-        , xlab="Stage"
-        , ylab="Complete steps")
-
-boxplot(as.numeric(dfSA$timeToComplete) ~ dfSA$stage_id
-        , main="Time to Complete by Course Stage"
-        , xlab="Stage"
-        , ylab="Number of days")
-
-par(mfrow=c(1,1))
-
 
 ```
 
