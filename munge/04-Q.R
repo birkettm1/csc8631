@@ -34,7 +34,7 @@ dfQR$step = strsplit(dfQR$quiz_question,split='.', fixed=TRUE)
 dfQR$step = sapply(dfQR$step, function(i){
   x = i[1]
   y = i[2]
-  a = paste(x,y, sep=".")
+  a = as.double(paste(x,y, sep="."))
 })
 
 #working directory back to root

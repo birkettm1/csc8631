@@ -1,4 +1,5 @@
 library('ProjectTemplate'); 
+setwd("C:/DevProjects/csc8631")
 load.project()
 
 #Question Responses
@@ -63,3 +64,12 @@ barplot(answerCount$n
         , main="Count of Responses by Question"
         , xlab="Question"
         , ylab="Count")
+
+#relate question_response to step activity on step
+dfQR$step
+dfQR$learner_id
+dfSA$step
+dfSA$learner_id
+
+dfQRWithStep <- left_join(dfQR, dfSA, 
+                           by = c("learner_id" = "learner_id", "step" = "step"))

@@ -25,16 +25,16 @@ The phases and tasks of a CRISP-DM project are outlined by the Data Science Alli
   + Data Mining Goals - what does success look like?
   
 2. Data Understanding - what data do we have / need? Identify, collect and analyse.
-  + Collect the initial data, aquire and load into data analysis tool.
+  + Collect the initial data, acquire and load into data analysis tool.
   + Describe the data, examine and document properties such as data format, number of records and identities
-  + Explore the data, query and visualise and idetntify the relationships.
+  + Explore the data, query and visualise and identify the relationships.
   + Verify the data quality and document any issues.
   
-3. Data Preparation - prepare the final datasets for modelling.
-  + Determine which data set to be used and reasons for inclusion / exlusion.
+3. Data Preparation - prepare the final data sets for modelling.
+  + Determine which data set to be used and reasons for inclusion / exclusion.
   + Clean the data
   + Construct data, carry out any required feature engineering.
-  + Integrate data, create new datasets by combining data sources
+  + Integrate data, create new data sets by combining data sources
   + Re-format data as necessary, cast data types as required.
 
 4. Modelling - what modelling techniques should we apply?
@@ -228,7 +228,7 @@ It can be clearly seen that concatenating the columns gives us the key.
 
   * __Related data sets__ -The step_position allows us to relate to step_activity which allows relationships through the rest of the dataset.
 
-  * __Data Quality__ - Data quality checks for type and missingness did not raise any issues. Upon investifation, the table is wide, it will be necessary to pivot to see any meaningful data. Also the data is expressed as percentages, to make the data comparable it will be necessary to convert to absolute numbers, and compare back to total_views.
+  * __Data Quality__ - Data quality checks for type and missingness did not raise any issues. Upon investigation, the table is wide, it will be necessary to pivot to see any meaningful data. Also the data is expressed as percentages, to make the data comparable it will be necessary to convert to absolute numbers, and compare back to total_views.
 
 
 * **Weekly Sentiments**. This is completed by each student per week. The sentiment data has n=181 items and p=6 variables. This table has a categorical properly rating and character data to cover the sentiment. I will not be looking to cover sentiment analysis in this work so only the categorical value will be looked at. 
@@ -239,7 +239,7 @@ It can be clearly seen that concatenating the columns gives us the key.
 
   * __Related data sets__ - None
 
-  * __Data Quality__ - ID, Week number and experience rating were cast to integer on import to standardise the data type across multiple data sets. Responded at was also cast from character to date time. Data quality checks revealed correct data types, and reason being missing in 111 cases from 181. There wwold be value in coverting this data to percentages.
+  * __Data Quality__ - ID, Week number and experience rating were cast to integer on import to standardise the data type across multiple data sets. Responded at was also cast from character to date time. Data quality checks revealed correct data types, and reason being missing in 111 cases from 181. There would be value in converting this data to percentages.
 
 
 The relationships between data sets as discussed above are documented below.
@@ -280,8 +280,10 @@ Particularly, it was identified that some feature engineering could be carried o
 * Question Responses, it was identified that while the dataset is missing the step column to relate the Step Activity table, this can be created from data which is present. This allows us to integrate responses to steps and to the wider dataset.
 
   * The quiz_question key was split on . to a list. SApply was then used to concatenate the first two elements together split by a dot. This was then added to the dataset.
+  
+  * Dplyr was then used to prove a left join between the question responses and step activity data sets.
 
-* Video Views, it was identified that this dataset has a logical collection of three types of data and could be split into three datasets, it was all observed that a pivotted data set would be required for analysis and the conversion of data from "percentages of percentages" to absolute counts.
+* Video Views, it was identified that this dataset has a logical collection of three types of data and could be split into three data sets, it was all observed that a pivoted data set would be required for analysis and the conversion of data from "percentages of percentages" to absolute counts.
 
   * Splitting out the child dataset was carried out by taking a slice of the original dataset.
     ```{r sliceVideoViews, echo=TRUE, results='hide'}
@@ -299,7 +301,7 @@ Particularly, it was identified that some feature engineering could be carried o
     dfVSTotals$"99" = as.percent(dfVSTotals$total_views, dfVSTotals$viewed_onehundred_percent)
   
   ```
-  * The result was then selected using Dplry to produce a neater table. A pivotted table was then created to support reporting. The figure below shows the transformed data in a logical structure for reporting. This was carried out for all three datasets.
+  * The result was then selected using Dplry to produce a neater table. A pivoted table was then created to support reporting. The figure below shows the transformed data in a logical structure for reporting. This was carried out for all three data sets.
   
   ```{r createPivot, echo=TRUE, results='hide'}
       dfVSTotals = select(dfVSTotals, step_position, title, "05", "10", "25", "50", "75", "95", "99")
@@ -313,10 +315,7 @@ Particularly, it was identified that some feature engineering could be carried o
    dfVSTotalsPivot
   ```
 
-Now that we have a new key to relate step_activity to question responses we can ensure it works.
-  
-This completes iteration 1. We have imported the data, completed basic data quality checks and completed any feature engineering challenges that have presented themselves. We have also taken the identified keys and proved merging of data frames in preparation for iteration 2.
-  
+This completes iteration 1. We have imported the data, completed basic data quality checks and completed any feature engineering challenges that have presented themselves. We have also taken the identified keys and proved merging of data frames in preparation for iteration 2. Iteration 2 will deal with the construction of a hypothesis and the investigation of such.
 
 
 ### Iteration 2
@@ -331,32 +330,3 @@ This completes iteration 1. We have imported the data, completed basic data qual
 
 ### References
 Data Science Alliance, 2021, What is CRISP-DM, https://www.datascience-pm.com/crisp-dm-2/, Accessed: 26/11/2021
-
-
-
-We can see that there are far more completed steps than incomplete, and that incomplete steps are generally earlier in the course. However, there are still students who complete early steps and subsequently fail to complete later ones. There also indicates a wide spread of time to complete each step, with a variance of 103.1396. An outlier of this is *Step 2.8* which takes everyone very few days to complete.
-
-Due to adding the stage of the course we can also see that the time to complete each unit reduces as the course wears on, as does the number of students that complete each step.
-
-
-It can be seen in the barplot for the Views by Video completion that the number of views which watched the whole video dropped off as they viewer got further through. For example we can see for the first video "1.1. Welcome to the course" that 1500 views completed 5% of the video, which drops to 1200 who completed 100%. This is then presented for each video throughout the course. As the course progresses the volume of students engaging with each video reduces reasonably significantly other than "1.5 Privacy online and offline" It can also be seen that some videos see a significant drop between 95% and 100% completion.
-
-When viewing Views by Device it can be seen that no video was viewed on a tablet or TV, all views were by Console, Desktop or Mobile. It can be seen that by far the majority of views were on a Console throughout the length of the course, so it may be concluded the videos should be designed to play best on a console. The data shown reflects the same changes in the volume of use as shown above, i.e. that "1.5 Privacy online and offline" shows an increase in views in an otherwise downward trend.
-
-By viewing Views by Location it can be seen that the majority of views are from Europe with non at all from Antarctica and few from North America, Oceania and South America. The data shown reflects the same changes in the volume of use as shown above, i.e. that "1.5 Privacy online and offline" shows an increase in views in an otherwise downward trend.
-
-There is potential to link views with stages and we could potentially look at leavers by location and device by using this view data along with the leaver survey responses. We could also look at test performance related to video completion, location or devices.
-
-
-
-As we can see from the weekly experience data below, across the three weeks of the course the total sentiment data provided by the student cohort went down from 73 to 45, although the experience ratings being provided remained consistent at approximately 90% providing a rating of 3.
-
-
-It would be of value to understand this data as a percentage of the total patient cohort. Given the lack of a "learner_id" in this data it isn't immediately possible to relate the sentiments back to a specific learner, so this data could only be looked into by step. There may be value in understanding after which step students decided to stop providing feedback, this could be related on the "stage_id".
-
-
-### 3 Conclusion and Hypothesis
-There is a wide breath of data in the data set regarding activity throughout the course, and richness is provided by the video views data frame which includes data such as the device used, location of the student and so forth. The use of the step dataset allows us to investigate the stage of the course which events happened, and the leavers dataset allows us to look into leavers. Knowing that the location work has been completed previously by other students, I feel that there is enough data to investigate something around student performance, stage and the decision to leave.
-
-I hyptothesise that the lower completion of videos and lower weekly sentiment scores increase the chances of a student choosing to leave the course. This will be investigated in iteration 2 of the CRISP-DM model.
-
