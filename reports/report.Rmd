@@ -82,22 +82,103 @@ Verify the data quality and document any issues.
 
 * **Enrollments**. Enrollment is a categorical dataset with n=37296 items and p=14 variables. It was found that the majority of data for all properties was "unknown" and therefore not suitable for further analysis. 
 
-  * **Primary Key** - "Learner_ID" of character data type.
+  * __Candidate Keys__ - "Learner_ID" of character data type.
   
-  * **Fields and format** - Properties include Country, Gender, Age Range, Highest Education Achieved, Employment Area and Employment Status, Role all of type character. Also date / time of enrolled, un-enrolled, fully participated and purchased statements.
+  * __Fields and data types__ - Properties include Country, Gender, Age Range, Highest Education Achieved, Employment Area and Employment Status, Role all of type character. Also date / time of enrolled, un-enrolled, fully participated and purchased statements.
   
-  * **Related data sets** - Team Member, Leaving Survey and Step Activity can be related on Learner_ID
+  * __Related data sets__ - Team Member, Leaving Survey and Step Activity can be related on Learner_ID
   
-  * **Data Quality** - The data types across date times in multiple files were inconsistent and therefore they were cast on import. The vast majority of data for each categorical value is "Unknown". We don't have enough data to analyse.
+  * __Data Quality__ - The data types across date times in multiple files were inconsistent and therefore they were cast on import. The vast majority of data for each categorical value is "Unknown". Once the data was imported a basic type and missingness check was carried out. This showed type failures of 1 record on each of the date fields (enrolled, unenrolled, fully participated and purchased statement), there were also significant gaps in the same date based data, between 35k and 37k records. However, there were no issues with the categorical data. This was then plotted to investigate the data as shown in Figure 1 "Categorical Enrollment Data".
+  
+``` {r EnrollmentPlots, echo=FALSE, out.width="100%", fig.cap="Categorical Enrollment Data"}
+#graph the enrollment data
+par(mfrow=c(2,3))
 
+#country
+countryData = dfE %>%
+  group_by(country) %>%
+  count(dfE$country) #do a count
+countryData = filter(countryData, n > 100) #filter only where greater than 100
+countryData = select(countryData, country, n) #select the correct cols
+barplot(countryData$n, main="Country",
+        names.arg = c("Australia", 'GB', "India", "Nigeria", "Unknown", "US")
+        , xlab = "Country"
+        , ylab="Count of Enrollments")
+#pie(countryData$n, labels = countryData$country, main="Enrollments by country greater than 10")
 
+#gender
+genderData = dfE %>%
+  group_by(gender) %>%
+  count(dfE$gender)
+genderData = select(genderData, gender, n)
+barplot(genderData$n, main="Gender",
+        names.arg = c("Female", 'Male', "Nonbinary", "Other", "Unknown")
+        , xlab = "Gender"
+        , ylab="Count of Enrollments")
+
+#age range
+agerangeData = dfE %>%
+  group_by(age_range) %>%
+  count(dfE$age_range)
+agerangeData = select(agerangeData, age_range, n)
+barplot(agerangeData$n, main="Age Range",
+        names.arg = c("<18", ">65", "18-25", "26-35", "36-45", "46-55", "56-65","Unknown")
+        , xlab = "Age Range"
+        , ylab="Count of Enrollments")
+
+#highest_education_level
+highestEducationData = dfE %>%
+  group_by(highest_education_level) %>%
+  count(dfE$highest_education_level)
+highestEducationData = select(highestEducationData, highest_education_level, n)
+barplot(highestEducationData$n, main="Highest Education",
+        names.arg = c("Apprenticeship", "<Secondary", "Professional", "Secondary", "Tertiary", "Degree", "Doctrate", "Masters", "Unknown")
+        , xlab = "Highest Educational Level"
+        , ylab="Count of Enrollments")
+
+#employment area
+employmentareaData = dfE %>%
+  group_by(employment_area) %>%
+  count(dfE$employment_area)
+employmentareaData = select(employmentareaData, employment_area, n)
+barplot(employmentareaData$n, main="Employment Area",
+        names.arg = employmentareaData$employment_area
+        , xlab = "Employment Area"
+        , ylab="Count of Enrollments")
+
+#employment area
+employmentstatusData = dfE %>%
+  group_by(employment_status) %>%
+  count(dfE$employment_status)
+employmentstatusData = select(employmentstatusData, employment_status, n)
+barplot(employmentstatusData$n, main="Employment Status",
+        names.arg = employmentstatusData$employment_status
+        , xlab = "Employment Status"
+        , ylab="Count of Enrollments")
+
+par(mfrow=c(1,1))
+```
+
+  It can be seen that the majority of the data for the categorical data fields is         "unknown" and therefore not suitable for further analysis.
+
+* **Step Activity**. This indicates the stage in the course that the related data occurred at. It is principally categorical data with n=423072 items and p=6 variables.
+
+  * __Candidate Keys__ - A compound key of "Learner_ID" of character data type and step (integer). This identifies data about the step the student was at.
+
+  * __Fields and data types__ - "Learner_ID" of type character, "week_number" and "step_number" both of which are integer and "step" which is also an integer and is a concatenation of the two. "First_Visited_At" and "Last_Completed_At" are both date times and indicate when the student was at that stage.
+
+  * __Related data sets__ - Enrollments via "Learner ID", Question Response, Video Stats and Sentiment Survey via Step. Each step in the step activity data frame has associated quiz questions and responses.
+
+  * __Data Quality__ - Data types were consistent across the files to be imported. Date times were cast on import. Basic data quality checks indicate that "First_Visited_At" and "Last_Completed_At" are natively characters and so they were cast to date times. Significant gaps were observed on "last_completed_at" which may be correct.
+  
+  
 * **Leaving Survey**. The leaving survey responses comprises of categorical, character and date based data regarding feedback from individuals which have left the course. The data frame has n=403 items and p=10 variables. The primary key of this table is ID which was cast to an integer in the import process.
 
-  * **Primary Key** - "ID" which was cast to integer during import.
+  * __Candidate Keys__ - "ID" which was cast to integer during import.
   
-  * **Fields and format** - "ID" as integer, "Learner_ID" as character, "Left_at" as datetime, the date and time a student left the course, "leaving_reason" as characters, "last_completed_step" as character and "last_completed_step" as as date time, also the "last_completed_week_number" and "last_completed_step_number".
+  * __Fields and data types__ - "ID" as integer, "Learner_ID" as character, "Left_at" as datetime, the date and time a student left the course, "leaving_reason" as characters, "last_completed_step" as character and "last_completed_step" as as date time, also the "last_completed_week_number" and "last_completed_step_number".
   
-  * **Related data sets** - Enrollments on "Learner_ID". Investigation into the key fields of "last_completed_step", "last_completed_step_number" and "last_completed_week_number" revealed that "last_completed_step" was a concatenation of the other two fields and could be used to relate to the Step Activity data. This allows the identification of the stage that students leave the course. This can be seen below.
+  * __Related data sets__ - Enrollments on "Learner_ID". Investigation into the key fields of "last_completed_step", "last_completed_step_number" and "last_completed_week_number" revealed that "last_completed_step" was a concatenation of the other two fields and could be used to relate to the Step Activity data. This allows the identification of the stage that students leave the course. This can be seen below.
   
   ```{r enrollmentsToStep, echo=FALSE, out.width="65%", fig.cap="Enrollment to Step Activity Keys"}
   dfLSR = dfLSR %>% filter(!is.na(last_completed_step))
@@ -105,51 +186,138 @@ Verify the data quality and document any issues.
        last_completed_week_number)[1:5,]
   ```
   
-  * **Data Quality** - Upon import it was necessary to standardise the data type across multiple files, id was cast to integer, last completed step to character and the last completed step and week numbers to integer. All date times were also cast to date time. Upon investigation of the data it was found that there were multiple leaving reasons which amounted to "lack of time", this field was merged to make it comparable to other values. 
+  * __Data Quality__ - Upon import it was necessary to standardise the data type across multiple files, id was cast to integer, last completed step to character and the last completed step and week numbers to integer. All date times were also cast to date time. Upon investigation of the data it was found that there were multiple leaving reasons which amounted to "lack of time" (Figure 1), this field was merged to make it comparable to other values (Figure 2)
   
+  ```{r reasonsForLeaving, echo=FALSE, out.width="75%", fig.cap="Native Reasons for Leaving"}
+    table(dfLSR$leaving_reason)
+  ```
+  Once corrected the data is comparable as per below.
   
-* **Step Activity**. This indicates the stage in the course that the related data occurred at. It is principally categorical data with n=423072 items and p=6 variables.
-  * **Primary Key** - A compound key of "Learner_ID" of character data type and step (integer). This identifies data about the step the student was at.
-  * **Fields and format** - "Learner_ID" of type character, "week_number" and "step_number" both of which are integer and "step" which is also an integer and is a concatenation of the two. First_Visited_At and "Last_Completed_At" are both date times and indicate when the student was at that stage.
-  * **Related data sets** - Enrollments via "Learner ID", Question Response, Video Stats and Sentiment Survey via Step.
-  * **Data Quality** - Data types were consistent across the files to be imported. Date times were cast on import.
-  
-  
-  
+  ```{r reasonsForLeavingEngineered, echo=FALSE, out.width="75%", fig.cap="Engineered Reasons for Leaving"}
+    barplot(table(dfLSR$reason)
+          , main="Reasons for Leaving"
+          , xlab="Reason"
+          , ylab="Count of Leavers")
+  ```
   
 * **Question Responses**. Each step in the step activity data frame has associated quiz questions and responses. This is stored in the questions data frame. The question responses data is categorical data with n=176463 items and p=10 variables.
-  * **Primary Key** - "Learner_ID" of character data type.
-  * **Fields and format** - 
-  * **Related data sets** - 
-  * **Data Quality** - 
-  
+
+  * __Candidate Keys__ - "Learner_ID" of character data type and quiz_question which is a concatenation of week_number, step_number and question_number. By concatenating just the week_number and step_number we are able to calculate the question step and relate to the Step Activity data set.
+
+  * __Fields and data types__ - Other properties outside of the keys are "question_type" which is exclusively "MultipleChoice", response of character which is the answer to the question, cloze_response which is always NA, submitted_at which is a datetime of the submitted at date and correct which is a boolean. This would give us access to the scores of each student
+
+  * __Related data sets__ - Some feature engineering would allow us to relate to the Step Activity data set and the learner_id allows us to relate to the Enrollments data set and any associated Leaving Surveys.
+
+  * __Data Quality__ - Simple data quality checks were carried out which showed the correct data types, and that Cloze_Response is always null. A review of week_number, step_number and question_number confirmed that they could be concatenated to form the tables primary key and a step key, as per Figure 4 below, "Question Response Key Construct".
+    
+```{r qrKeys, echo=FALSE, out.width="75%", fig.cap="Question Response Key Construct"}
+dfQRNumbers <- select(dfQR, quiz_question, week_number, step_number, question_number)
+dfQRNumbers <- group_by(dfQRNumbers)
+dfQRNumbers <- dfQRNumbers %>%
+  group_by(quiz_question)
+unique(dfQRNumbers)
+```
+It can be clearly seen that concatenating the columns gives us the key.
+
+
 * **Video Views**. Each step in the step activity data frame also has associated video view data. The video stats data is multivariate data with n=65 items and p=29 variables. There are significantly more data variables in this relation then in those examined previously, and significantly less data items. 
-  * **Primary Key** - 
-  * **Fields and format** - 
-  * **Related data sets** - 
-  * **Data Quality** - 
+
+  * __Candidate Keys__ - "Step_Position" identifies the videos position within in the course as a whole and could be related to Step Activity. This along with the video title would uniquely identify he video and the rest of the data in the data set is already grouped.
+
+  * __Fields and type__ - All of the fields in this dataset other than "title" are categorical and are integers. The data in this relation can be subsetted into data pertaining to percentage complete, type of device and location of the video view which allows investigation of each specific facet. This will be revisited at the data preparation stage if required.
+
+  * __Related data sets__ -The step_position allows us to relate to step_activity which allows relationships through the rest of the dataset.
+
+  * __Data Quality__ - Data quality checks for type and missingness did not raise any issues. Upon investifation, the table is wide, it will be necessary to pivot to see any meaningful data. Also the data is expressed as percentages, to make the data comparable it will be necessary to convert to absolute numbers, and compare back to total_views.
+
 
 * **Weekly Sentiments**. This is completed by each student per week. The sentiment data has n=181 items and p=6 variables. This table has a categorical properly rating and character data to cover the sentiment. I will not be looking to cover sentiment analysis in this work so only the categorical value will be looked at. 
-  * **Primary Key** - "ID" has been cast to integer during the import process
-  * **Fields and format** - 
-  * **Related data sets** - 
-  * **Data Quality** - 
 
-The relationships between data sets were documented as per Figure 1.
+  * __Candidate Keys__ - "ID" has been cast to integer during the import process, other than week_number i do not see a key to create a relationship into the wider data set.
+
+  * __Fields and data types__ - "Experience_rating" is an integer between 1 and 3 which gives the rating of the student for that week. "Week_number" is the number for the week between 1 and 3 and "reason" is a character string to justify the experience_rating.
+
+  * __Related data sets__ - None
+
+  * __Data Quality__ - ID, Week number and experience rating were cast to integer on import to standardise the data type across multiple data sets. Responded at was also cast from character to date time. Data quality checks revealed correct data types, and reason being missing in 111 cases from 181. There wwold be value in coverting this data to percentages.
+
+
+The relationships between data sets as discussed above are documented below.
 
 ![Relationships between data frames.](erd.png "Entity Relationship Diagram"){width=75%}
 
 #### Data Preparation
-3. Data Preparation - prepare the final datasets for modelling.
-  * Determine which data set to be used and reasons for inclusion / exclusion.
-  * Clean the data
-  * Construct data, carry out any required feature engineering.
-  * Integrate data, create new datasets by combining data sources
-  * Re-format data as necessary, cast data types as required.
+Each set of data was imported into a dataframe during the data understanding stage. This was done by filtering the file set and reading the contents of each file to a list. This was then bound by Dplyr. The example below binds all *question.response.csv files into a dataframe.
+
+```{r importFiles, echo=TRUE, results='hide'}
+  #working files
+  files = list.files(pattern="*question.response.csv")
+
+  datalist = lapply(files, function(i){
+    csv <- read_csv(i, show_col_types = FALSE)
+    csv$stage_id <- substring(i,16,16)
+    csv
+  })
+  dfQR <-dplyr::bind_rows(datalist)
+```
+
+As we still do not have a clear business objective in this first iteration, the data preparation stage will be used to implement any data changes to make a more completed and integrated dataset. The changes implemented here may or may not be required in the analysis carried out in iteration 2, they have merely been observed while carrying out the steps during the data understanding process. Processes such as re-formatting and casting the data have already been carried out in the data understanding step to successfully merge multiple CSV files into one data frame.
+
+Particularly, it was identified that some feature engineering could be carried out to prepare the data for further analysis. These fixes were implemented in the munge process. Particularly:
+
+* __Step Activity__, this dataset has the step start and end date, some data engineers was completed to add an "isComplete" flag to the dataset, as well as a "completedTime" integer indicating the difference between the start and end date of the step. 
+
+  * An isComplete flag was added by checking the last_completed_at date for NA. 
+  ```{r isComplete, echo=TRUE, results='hide'}
+    dfSA$isComplete = !is.na(dfSA$last_completed_at) 
+  ```
+  * A time to complete count in days was added by subtracting the start date from the end date.
+  ```{r timeToComplete, echo=TRUE, results='hide'}
+  dfSA$timeToComplete = difftime(dfSA$last_completed_at, dfSA$first_visited_at, 
+                               units="days") #calculate the difference
+  ```
+
+* Question Responses, it was identified that while the dataset is missing the step column to relate the Step Activity table, this can be created from data which is present. This allows us to integrate responses to steps and to the wider dataset.
+
+  * The quiz_question key was split on . to a list. SApply was then used to concatenate the first two elements together split by a dot. This was then added to the dataset.
+
+* Video Views, it was identified that this dataset has a logical collection of three types of data and could be split into three datasets, it was all observed that a pivotted data set would be required for analysis and the conversion of data from "percentages of percentages" to absolute counts.
+
+  * Splitting out the child dataset was carried out by taking a slice of the original dataset.
+    ```{r sliceVideoViews, echo=TRUE, results='hide'}
+    dfVSTotals = dfVS[,c(1,2,4, 9:15)]
+    ```
+  * The data frame was then extended by adding the appropriate properties. In this example a helper function was used to express the percent as raw numbers..
   
+  ```{r createAdditionalProperties, echo=true, results='hide'}
+    dfVSTotals$"05" = as.percent(dfVSTotals$total_views, dfVSTotals$viewed_five_percent)
+    dfVSTotals$"10" = as.percent(dfVSTotals$total_views, dfVSTotals$viewed_ten_percent)
+    dfVSTotals$"25" = as.percent(dfVSTotals$total_views, dfVSTotals$viewed_twentyfive_percent)
+    dfVSTotals$"50" = as.percent(dfVSTotals$total_views, dfVSTotals$viewed_fifty_percent)
+    dfVSTotals$"75" = as.percent(dfVSTotals$total_views, dfVSTotals$viewed_seventyfive_percent)
+    dfVSTotals$"95" = as.percent(dfVSTotals$total_views, dfVSTotals$viewed_ninetyfive_percent)
+    dfVSTotals$"99" = as.percent(dfVSTotals$total_views, dfVSTotals$viewed_onehundred_percent)
   
-<!-- Step activity feature engineering
-The data includes the step number, the step start and end date with the learner_id. The end date has been used to indicate whether a step was complete for that student and how long the step took, this has resulted in 2 new columns - "isComplete" flag and "completedTime" in days, and allows us to calculate step completion stats and time scales per step as per below. -->
+  ```
+  * The result was then selected using Dplry to produce a neater table. A pivotted table was then created to support reporting. The figure below shows the transformed data in a logical structure for reporting. This was carried out for all three datasets.
+  
+  ```{r createPivot, echo=TRUE, results='hide'}
+      dfVSTotals = select(dfVSTotals, step_position, title, "05", "10", "25", "50", "75", "95", "99")
+    dfVSTotalsPivot = dfVSTotals %>% 
+      pivot_longer(!(1:2), names_to = "percentviewed", values_to = "count") #createpivot
+  ```
+
+  The formatted data for reporting is as per below.
+
+  ```{r pivottedViews, echo=FALSE, out.width="75%", fig.cap="Tranformed Video View Data"}
+   dfVSTotalsPivot
+  ```
+
+Now that we have a new key to relate step_activity to question responses we can ensure it works.
+  
+This completes iteration 1. We have imported the data, completed basic data quality checks and completed any feature engineering challenges that have presented themselves. We have also taken the identified keys and proved merging of data frames in preparation for iteration 2.
+  
+
 
 ### Iteration 2
 
@@ -165,71 +333,11 @@ The data includes the step number, the step start and end date with the learner_
 Data Science Alliance, 2021, What is CRISP-DM, https://www.datascience-pm.com/crisp-dm-2/, Accessed: 26/11/2021
 
 
-```{r leaversByLastCompleteStep, echo=FALSE, out.width="65%", fig.cap="Leavers by Step of Course"}
-
-```
 
 We can see that there are far more completed steps than incomplete, and that incomplete steps are generally earlier in the course. However, there are still students who complete early steps and subsequently fail to complete later ones. There also indicates a wide spread of time to complete each step, with a variance of 103.1396. An outlier of this is *Step 2.8* which takes everyone very few days to complete.
 
 Due to adding the stage of the course we can also see that the time to complete each unit reduces as the course wears on, as does the number of students that complete each step.
 
-The addition of the feature engineered values gives us the potential to use this dataset in further analysis. There is potential to look at incomplete steps in relation to course leavers, and investigate the short completion times of step 2.8.
-
-Each step in the step activity data frame has associated quiz questions and responses. This is stored in the questions data frame. The question responses data is categorical data with n=176463 items and p=12 variables after the feature engineeering outlined below. The question responses table has the quiz question which includes the step number. Feature engineering was carried out to extract the correct step number and add it to a column, should there be a need to relate to the the activity steps.
-
-An examination of the data was carried out to look at the volume of responses.
-
-```{r plotQuestionResponses, echo=FALSE, out.width="65%", fig.cap="Quiz Question Responses"}
-
-answerCount = dfQR %>%
-  group_by(quiz_question) %>%
-  count(dfQR$response)
-answerCount = select(answerCount, quiz_question, n)
-
-#responses by question
-barplot(answerCount$n
-        , main="Count of Responses by Question"
-        , xlab="Question"
-        , ylab="Count")
-  
-```
-
-As we can see there are significant differences in number of times each question was answered over the length of the course and the as expected mix of correct and incorrect answers. There is the potential here to look into the mix of correct and incorrect answers, potentially investigating any relationship between low attainment on the quizzes throughout the course to the student subsequently leaving.
-
-Each step in the step activity data frame also has associated video view data. The video stats data is multivariate data with n=65 items and p=29 variables. There are significantly more data variables in this relation then in those examined previously, and significantly less data items. 
-
-The data in this relation can be subsetted into data pertaining to percentage complete, type of device and location of the video view, so three data sets were created with just this data present. Some work was then done to convert the data from percentages to raw numbers, and then to pivot the result to allow some insights into the number of views, views by device and views by location in Figures 7, 8 and 9 below.
-
-```{r plotVideoStatsOverall, echo=FALSE, fig.cap="Video Views"}
-
-vid1 = ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
-  geom_bar(stat="identity", position="dodge") +
-  labs(title= "Views by Video Completion", y="Views", x = "Video") + 
-  scale_fill_brewer(palette="PuBu", name="Viewed",
-                    breaks=c("05", "10", "25" ,"50","75","95", "99"),
-                    labels=c("5%", "10%", "25%" ,"50%","75%","95%", "100%")) +
-  theme_bw() + 
-  theme(axis.text.x = element_text(angle = 90))
-
-#video by device
-vid2 = ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
-  geom_bar(stat="identity", position="dodge") +
-  labs(title= "Views by Device", y="Views", x = "Video") + 
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu", name="Device") +
-  theme(axis.text.x = element_text(angle = 90))
-
-#video by location
-vid3 = ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
-  geom_bar(stat="identity", position="dodge") +
-  labs(title= "Views by Location", y="Views", x = "Video") + 
-  scale_fill_brewer(palette="PuBu", name="Location") +
-  theme_bw() + 
-  theme(axis.text.x = element_text(angle = 90))
-
-grid.arrange(vid1, vid2, vid3, ncol=2, nrow=2)
-
-```
 
 It can be seen in the barplot for the Views by Video completion that the number of views which watched the whole video dropped off as they viewer got further through. For example we can see for the first video "1.1. Welcome to the course" that 1500 views completed 5% of the video, which drops to 1200 who completed 100%. This is then presented for each video throughout the course. As the course progresses the volume of students engaging with each video reduces reasonably significantly other than "1.5 Privacy online and offline" It can also be seen that some videos see a significant drop between 95% and 100% completion.
 
@@ -239,65 +347,16 @@ By viewing Views by Location it can be seen that the majority of views are from 
 
 There is potential to link views with stages and we could potentially look at leavers by location and device by using this view data along with the leaver survey responses. We could also look at test performance related to video completion, location or devices.
 
-The final data frame related to the course stage is the weekly sentiment data, this is completed by each student per week. The sentiment data has n=181 items and p=6 variables. This table has a categorical properly rating and character data to cover the sentiment. I will not be looking to cover sentiment analysis in this work so only the categorical value will be looked at.
+
 
 As we can see from the weekly experience data below, across the three weeks of the course the total sentiment data provided by the student cohort went down from 73 to 45, although the experience ratings being provided remained consistent at approximately 90% providing a rating of 3.
 
-```{r plotSentimentAnalysis, echo=FALSE, out.width="75%", fig.cap="Sentiment Completions"}
 
-ggplot(dfSS, aes(x=week_number, fill=factor(experience_rating))) + 
-  geom_bar(position="stack") +
-  labs(title= "Weekly Experience Rating", y="Count", x = "Week Number") +
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu", name="Experience Rating")
-
-```
 It would be of value to understand this data as a percentage of the total patient cohort. Given the lack of a "learner_id" in this data it isn't immediately possible to relate the sentiments back to a specific learner, so this data could only be looked into by step. There may be value in understanding after which step students decided to stop providing feedback, this could be related on the "stage_id".
+
 
 ### 3 Conclusion and Hypothesis
 There is a wide breath of data in the data set regarding activity throughout the course, and richness is provided by the video views data frame which includes data such as the device used, location of the student and so forth. The use of the step dataset allows us to investigate the stage of the course which events happened, and the leavers dataset allows us to look into leavers. Knowing that the location work has been completed previously by other students, I feel that there is enough data to investigate something around student performance, stage and the decision to leave.
 
 I hyptothesise that the lower completion of videos and lower weekly sentiment scores increase the chances of a student choosing to leave the course. This will be investigated in iteration 2 of the CRISP-DM model.
 
-
-#### Iteration 2 Hypothesis
-Test performance vs video views vs leavers
-
-## Iteration 2
-Iteration 2 will further investigate the hypothesis identified in iteration 1 and will present the findings.
-
-Location Analysis
-Multivariate Analysis
-GGPlot2
-
-
-### Findings
-To answer the hypothesis XYZ the findings are that ABC
-
-## Conclusion
-
-
-
-ReadR - https://readr.tidyverse.org/index.html
-DiagrammeR - https://rich-iannone.github.io/DiagrammeR/
-Working with categorical data - https://cran.r-project.org/web/packages/vcdExtra/vignettes/vcd-tutorial.pdf 
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

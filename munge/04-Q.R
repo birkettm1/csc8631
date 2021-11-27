@@ -28,9 +28,8 @@ dfQR %>%
 
 dfQR$stage_id = as.integer(dfQR$stage_id)
 
-x = strsplit(dfQR$quiz_question,split='.', fixed=TRUE)
-
 #split out the quiz question get first two elements and use as step
+dfQR = filter(dfQR, grepl(".", dfQR$quiz_question, fixed = TRUE))
 dfQR$step = strsplit(dfQR$quiz_question,split='.', fixed=TRUE)
 dfQR$step = sapply(dfQR$step, function(i){
   x = i[1]
