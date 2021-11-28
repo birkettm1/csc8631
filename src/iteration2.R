@@ -32,6 +32,7 @@ dfPerson = select(dfStudentLeavers, learner_id, gender, country, age_range,
 #steps
 dfStep = select(dfSA, learner_id, step, isComplete, timeToComplete)
 
+
 #answers
 dfAnswers = select(dfQR, learner_id, step, week_number, quiz_question, response, submitted_at, correct)
 
@@ -47,7 +48,6 @@ dfVSTotalsPivot
 dfSentiment <- dfSS
 
 #some investigation
-
 #roles
 table(dfStudentInfo[,6]) # archetype
 table(dfStudentInfo[,7]) # role
@@ -227,6 +227,28 @@ ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.chara
   theme_bw() + 
   theme(axis.text.x = element_text(angle = 90))
 
+#continuous data in entire dataset
+
+#Student Info - Enrolled length of time
+dfStudentInfo$totalEnrolledTime = difftime(dfStudentInfo$unenrolled_at, 
+                                           dfStudentInfo$enrolled_at, 
+                                           units="days") #calculate the difference
+summary(dfStudentInfo$totalEnrolledTime)
+df <- dfStudentInfo %>% drop_na(totalEnrolledTime)
+df <- filter(dfStep, timeToComplete !=0) 
+df$totalEnrolledTime
+df <- select(df, learner_id, enrolled_at, unenrolled_at, totalEnrolledTime)
+summary(df)
+dim(df)
+head(df) #4364 rows
+#are people who were enrolled longer more likely to leave without finishing the course?
+#how do we define finshing the course? Completing the last step
+
+#Step time to complete
+summary(dfStep$timeToComplete)
+df <- filter(dfStep, timeToComplete !=0) #29075 rows due to lack of first_visited_at and last_completed_at data
+
+dfVideoX is the continuous data.
 #Investigate if there is any relationship between archetype and views, or drop out rate.
 #Investigate any relationship between views and leavers
 #Investigate any relationship between sentiment, views and leavers
