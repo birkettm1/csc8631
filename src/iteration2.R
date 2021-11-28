@@ -14,17 +14,13 @@ head(dfSS) #sentiment survey #pk is id
 
 #data transformations
 #create dfStudent and person from enrollments, archetypes, team members
-#enrollment to archeype
-dfStudent <- left_join(dfE, dfAR, by = c("learner_id" = "learner_id"))
-
-#to team member
-dfStudentTM <- left_join(dfStudent, dfTM, by = c("learner_id" = "learner_id"))
-
-#to leavers
-dfStudentLeavers <- left_join(dfStudentTM, dfLSR, by = c("learner_id" = "learner_id"))
-dfStudentLeavers$left = !is.na(dfStudentInfo$last_completed_step)
+dfStudent <- left_join(dfE, dfAR, by = c("learner_id" = "learner_id")) #enrollment
+dfStudentTM <- left_join(dfStudent, dfTM, by = c("learner_id" = "learner_id")) #team member
+dfStudentLeavers <- left_join(dfStudentTM, dfLSR, by = c("learner_id" = "learner_id")) #leavers
+dfStudentLeavers$left = !is.na(dfStudentLeavers$last_completed_step) #set leaver flag
 #summary(dfStudent)
 
+#select out two tables
 dfStudentInfo = select(dfStudentLeavers, learner_id, enrolled_at, unenrolled_at,
                   fully_participated_at, purchased_statement_at, 
                   archetype, role, team_role, user_role)
@@ -37,9 +33,9 @@ dfPerson = select(dfStudentLeavers, learner_id, gender, country, age_range,
 dfStep = select(dfSA, learner_id, step, isComplete, timeToComplete)
 
 #answers
-dfAnswers = select(dfQR, learner_id, step, quiz_question, response, submitted_at, correct)
+dfAnswers = select(dfQR, learner_id, step, week_number, quiz_question, response, submitted_at, correct)
 
-#videos
+#videos - from iteration 1
 dfVSDevice
 dfVSDevicePivot
 dfVSLocation
@@ -48,9 +44,10 @@ dfVSTotals
 dfVSTotalsPivot
 
 #sentiment
-dfSS
+dfSentiment <- dfSS
 
 #some investigation
+
 #roles
 table(dfStudentInfo[,6]) # archetype
 table(dfStudentInfo[,7]) # role
@@ -140,6 +137,94 @@ ggplot(data = df, aes(fill=isComplete, x = employment_status, y=step)) +
   labs(title="Step Outcomes by Student Employment Status", y="Count", x = "Employment Status") + 
   theme_bw() + 
   scale_fill_brewer(palette="PuBu", name="Complete") +
+  theme(axis.text.x = element_text(angle = 90))
+
+
+#answers
+dfAnswers
+
+#answers by question
+df = dfAnswers %>% group_by(quiz_question) %>% count(dfAnswers$step)
+df = select(answerCount, quiz_question, n)
+ggplot(data = df, aes(x = quiz_question, y=n)) +
+  geom_bar(stat="identity") +
+  labs(title="Questions Answered", y="Answers", x = "Question Number") + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu") +
+  theme(axis.text.x = element_text(angle = 90))
+
+#outcome by question
+df = dfAnswers %>% group_by(quiz_question) %>% count(dfAnswers$correct)
+colnames(df) <- c('Quiz_Question', 'Correct', 'Count')
+ggplot(data = df, aes(fill=Correct, x = Quiz_Question, y=Count)) +
+  geom_bar(stat="identity") +
+  labs(title="Question Outcome", y="Count", x = "Question Number") + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu") +
+  theme(axis.text.x = element_text(angle = 90))
+
+#outcome by ...
+dfPerson
+dfStudentInfo
+dfAnswers
+
+#archetype
+df = left_join(dfStudentInfo, dfAnswers, by = c("learner_id" = "learner_id"))
+df <- select(df, learner_id, archetype, quiz_question, correct)
+df <- df %>% drop_na(archetype)
+df <- df %>% drop_na(correct)
+#summary(df)
+ggplot(data = df, aes(fill=correct, x = archetype)) +
+  geom_bar() +
+  labs(title="Question Outcome by Archetype", y="Count", x = "Archetype") + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu") +
+  theme(axis.text.x = element_text(angle = 90))
+
+#highest educational achievement
+df = left_join(dfPerson, dfAnswers, by = c("learner_id" = "learner_id"))
+df <- select(df, learner_id, highest_education_level , quiz_question, correct)
+df <- filter(df, df$highest_education_level != "Unknown")
+df <- df %>% drop_na(highest_education_level)
+df <- df %>% drop_na(correct)
+ggplot(data = df, aes(fill=correct, x = highest_education_level )) +
+  geom_bar() +
+  labs(title="Question Outcome by Highest Educational Level", y="Count", x = "Archetype") + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu") +
+  theme(axis.text.x = element_text(angle = 90))
+
+#videos
+dfVSDevice
+dfVSDevicePivot
+dfVSLocation
+dfVSLocationPivot
+dfVSTotals
+dfVSTotalsPivot
+
+ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title= "Views by Video Completion", y="Views", x = "Video") + 
+  scale_fill_brewer(palette="PuBu", name="Viewed",
+                    breaks=c("05", "10", "25" ,"50","75","95", "99"),
+                    labels=c("5%", "10%", "25%" ,"50%","75%","95%", "100%")) +
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90))
+
+#video by device
+ggplot(data = dfVSDevicePivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title= "Views by Device", y="Views", x = "Video") + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu", name="Device") +
+  theme(axis.text.x = element_text(angle = 90))
+
+#video by location
+ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
+  geom_bar(stat="identity", position="dodge") +
+  labs(title= "Views by Location", y="Views", x = "Video") + 
+  scale_fill_brewer(palette="PuBu", name="Location") +
+  theme_bw() + 
   theme(axis.text.x = element_text(angle = 90))
 
 #Investigate if there is any relationship between archetype and views, or drop out rate.
