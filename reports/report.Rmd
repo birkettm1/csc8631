@@ -74,11 +74,6 @@ Upon initial import is was found that the detected data types were not consisten
 
 Upon investigation it was decided that some data would be disregarded due to lack of breath. Therefore, we have data covering the life cycle of a student including:
 
-<!-- 
-Describe the data, examine and document properties such as data format, number of records and identities.
-Explore the data, query and visualise and identify the relationships.
-Verify the data quality and document any issues.
--->
 
 * **Enrollments**. Enrollment is a categorical dataset with n=37296 items and p=14 variables. It was found that the majority of data for all properties was "unknown" and therefore not suitable for further analysis. 
 
@@ -160,6 +155,7 @@ par(mfrow=c(1,1))
 ```
 
   It can be seen that the majority of the data for the categorical data fields is         "unknown" and therefore not suitable for further analysis.
+
 
 * **Step Activity**. This indicates the stage in the course that the related data occurred at. It is principally categorical data with n=423072 items and p=6 variables.
 
@@ -315,16 +311,22 @@ Particularly, it was identified that some feature engineering could be carried o
    dfVSTotalsPivot
   ```
 
-This completes iteration 1. We have imported the data, completed basic data quality checks and completed any feature engineering challenges that have presented themselves. We have also taken the identified keys and proved merging of data frames in preparation for iteration 2. Iteration 2 will deal with the construction of a hypothesis and the investigation of such.
+To support the next iteration I have merged the Team Member, Archetype and Enrollment data sets to create separate Person and Student Info datasets, these are related on Learner_ID. Person contains details about the person including age, age_range, education level. StudentInfo contains student centric information such as enrollment dates and various roles, archetypes etc. I have also slimmed down the Step and Answers datasets. We are now left with the following structure to go into iteration 2.
+
+![Relationships between data frames.](transformedERD.png "Transformed Entity Relationship Diagram"){width=75%}
 
 
 ### Iteration 2
+Look at a hypotheses and repeat the steps as outlined in the introduction. Look into test results as we have a lot of data about it, relate to time in the course and leavers.
 
 #### Business Understanding - Hypothesis
 
+
 #### Data Understanding
 
+
 #### Data Preparation
+
 
 ### Conclusions
 

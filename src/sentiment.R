@@ -1,3 +1,6 @@
+library('ProjectTemplate'); 
+load.project()
+
 #something about sentiment - relate back via week_number
 summary(dfSS)
 

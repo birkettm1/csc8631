@@ -71,5 +71,6 @@ dfQR$learner_id
 dfSA$step
 dfSA$learner_id
 
+#test on dplyr join
 dfQRWithStep <- left_join(dfQR, dfSA, 
                            by = c("learner_id" = "learner_id", "step" = "step"))
