@@ -3,40 +3,21 @@ setwd("C:/DevProjects/csc8631")
 load.project()
 
 #Iteration 2
-head(dfE) #enrollments #pk is id
-head(dfTM) #team members #pk is id
-head(dfAR) #archetype responses #pk is id
-head(dfSA) #step activity
-head(dfQR) #question response #pk is id
-head(dfLSR) #leaving survey #pk is id
-head(dfVS) #video stats #pk is id
-head(dfSS) #sentiment survey #pk is id
 
-#data transformations
-#create dfStudent and person from enrollments, archetypes, team members
-dfStudent <- left_join(dfE, dfAR, by = c("learner_id" = "learner_id")) #enrollment
-dfStudentTM <- left_join(dfStudent, dfTM, by = c("learner_id" = "learner_id")) #team member
-dfStudentLeavers <- left_join(dfStudentTM, dfLSR, by = c("learner_id" = "learner_id")) #leavers
-dfStudentLeavers$left = !is.na(dfStudentLeavers$last_completed_step) #set leaver flag
-#summary(dfStudent)
-
-#select out two tables
-dfStudentInfo = select(dfStudentLeavers, learner_id, enrolled_at, unenrolled_at,
-                  fully_participated_at, purchased_statement_at, 
-                  archetype, role, team_role, user_role)
-
-dfPerson = select(dfStudentLeavers, learner_id, gender, country, age_range, 
-                   highest_education_level, employment_status, employment_area,
-                   detected_country, left)
+#enrollments
+dfStudentInfo
+dfPerson
 
 #steps
-dfStep = select(dfSA, learner_id, step, isComplete, timeToComplete)
-
+dfStep
 
 #answers
-dfAnswers = select(dfQR, learner_id, step, week_number, quiz_question, response, submitted_at, correct)
+dfAnswers
 
-#videos - from iteration 1
+#sentiment
+dfSentiment
+
+#videos
 dfVSDevice
 dfVSDevicePivot
 dfVSLocation
@@ -44,108 +25,57 @@ dfVSLocationPivot
 dfVSTotals
 dfVSTotalsPivot
 
-#sentiment
-dfSentiment <- dfSS
 
-#some investigation
+#Investigation
+
 #roles
 table(dfStudentInfo[,6]) # archetype
 table(dfStudentInfo[,7]) # role
 table(dfStudentInfo[,8]) # team_role
 table(dfStudentInfo[,9]) # user_role
 
-#archetypes
-df <- dfStudentInfo[,c(1,6)] %>% drop_na(archetype)
-ggplot(data = df, aes(x = archetype)) +
-  geom_bar() +
-  labs(title= "Students by Archetype", y="Count", x = "Archetype") +  
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu")
-  # + theme(axis.text.x = element_text(angle = 90))
-
-#team roles
-df <- dfStudentInfo[,c(1,8)] %>% drop_na(team_role)
-ggplot(data = df, aes(x = team_role)) +
-  geom_bar() +
-  labs(title="Students by Team Role", y="Count", x = "Team Role") + 
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu")
-  #+ theme(axis.text.x = element_text(angle = 90))
-
-#leavers
-ggplot(data = dfPerson, aes(x = left)) +
-  geom_bar() +
-  labs(title="Leaver Students", y="Count", x = "Left") + 
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu")
+#enrollment 
+plot.enrollment(dfStudentInfo[,c(1,6)], 'archetype') #role
+plot.enrollment(dfStudentInfo[,c(1,7)], 'role') #role
+plot.enrollment(dfStudentInfo[,c(1,8)], 'team_role') #team_roles
+plot.enrollment(dfStudentInfo[,c(1,9)], 'user_role') #user_role
+plot.enrollment(dfPerson, 'left') #leavers
+plot.enrollment(dfPerson[,c(1,2)], 'gender') #gender
+plot.enrollment(dfPerson[,c(1,3)], 'country') #country
+plot.enrollment(dfPerson[,c(1,4)], 'age_range') #age_range
+plot.enrollment(dfPerson[,c(1,5)], 'highest_education_level') #highest education
+plot.enrollment(dfPerson[,c(1,6)], 'employment_status') #employment status
+plot.enrollment(dfPerson[,c(1,7)], 'employment_area') #employment area
+plot.enrollment(dfPerson[,c(1,8)], 'detected_country') #detected country
 
 #completed steps - raw counts
 dfCompletedSteps = filter(dfStep, isComplete==TRUE)
 dfCompletedSteps$step = as.character(dfCompletedSteps$step)
-ggplot(data = dfCompletedSteps, aes(x = step)) +
+ggplot(data = dfCompletedSteps, aes(x = as.character(step))) +
   geom_bar() +
   labs(title="Completed Steps", y="Count", x = "Step") + 
   theme_bw() + 
   scale_fill_brewer(palette="PuBu") + 
   theme(axis.text.x = element_text(angle = 90))
 
-#completed steps by archetype
-df <- left_join(dfStudentInfo, dfStep, by = c("learner_id" = "learner_id"))
-df <- select(df, learner_id, step, archetype, isComplete)
-df <- df %>% drop_na(archetype)
-#summary(df)
-ggplot(data = df, aes(fill=isComplete, x = archetype, y=step)) +
-  geom_bar(stat="identity") +
-  labs(title="Step Outcomes by Student Archetype", y="Count", x = "Archetype") + 
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu", name="Complete") + 
-  theme(axis.text.x = element_text(angle = 90))
+plot.progress(dfStudentInfo, 'archetype')
+plot.progress(dfStudentInfo, 'role')
+plot.progress(dfStudentInfo, 'team_role')
+plot.progress(dfStudentInfo, 'user_role')
+plot.progress(dfPerson, 'left')
+plot.progress(dfPerson, 'gender')
+plot.progress(dfPerson, 'country')
+plot.progress(dfPerson, 'age_range')
+plot.progress(dfPerson, 'highest_education_level')
+plot.progress(dfPerson, 'employment_status')
+plot.progress(dfPerson, 'employment_area')
+plot.progress(dfPerson, 'detected_country')
 
-#completed steps by team role #learner students don't have a team role
-df <- left_join(dfStudentInfo, dfStep, by = c("learner_id" = "learner_id"))
-df <- select(df, learner_id, step, team_role, isComplete)
-df <- df %>% drop_na(team_role)
-summary(df)
-ggplot(data = df, aes(fill=isComplete, x = team_role, y=step)) +
-  geom_bar(stat="identity") +
-  labs(title="Step Outcomes by Student Team Role", y="Count", x = "Team Role") + 
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu", name="Complete") 
-  # + theme(axis.text.x = element_text(angle = 90))
-
-#completed steps by highest education level
-df <- left_join(dfPerson, dfStep, by = c("learner_id" = "learner_id"))
-df <- select(df, learner_id, step, highest_education_level, isComplete)
-df <- filter(df, df$highest_education_level != "Unknown")
-df <- df %>% drop_na(highest_education_level)
-#summary(df)
-ggplot(data = df, aes(fill=isComplete, x = highest_education_level, y=step)) +
-  geom_bar(stat="identity") +
-  labs(title="Step Outcomes by Student Highest Education Level", y="Count", x = "Highest Education Level") + 
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu", name="Complete") +
-  theme(axis.text.x = element_text(angle = 90))
-
-#completed steps by employment status
-df <- left_join(dfPerson, dfStep, by = c("learner_id" = "learner_id"))
-df <- select(df, learner_id, step, employment_status, isComplete)
-df <- filter(df, df$employment_status != "Unknown")
-df <- df %>% drop_na(employment_status)
-#summary(df)
-ggplot(data = df, aes(fill=isComplete, x = employment_status, y=step)) +
-  geom_bar(stat="identity") +
-  labs(title="Step Outcomes by Student Employment Status", y="Count", x = "Employment Status") + 
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu", name="Complete") +
-  theme(axis.text.x = element_text(angle = 90))
-
-
-#answers
-dfAnswers
+#question and answers
 
 #answers by question
 df = dfAnswers %>% group_by(quiz_question) %>% count(dfAnswers$step)
-df = select(answerCount, quiz_question, n)
+df = select(df, quiz_question, n)
 ggplot(data = df, aes(x = quiz_question, y=n)) +
   geom_bar(stat="identity") +
   labs(title="Questions Answered", y="Answers", x = "Question Number") + 
@@ -158,41 +88,24 @@ df = dfAnswers %>% group_by(quiz_question) %>% count(dfAnswers$correct)
 colnames(df) <- c('Quiz_Question', 'Correct', 'Count')
 ggplot(data = df, aes(fill=Correct, x = Quiz_Question, y=Count)) +
   geom_bar(stat="identity") +
-  labs(title="Question Outcome", y="Count", x = "Question Number") + 
+  labs(title="Question Result", y="Count", x = "Question Number") + 
   theme_bw() + 
   scale_fill_brewer(palette="PuBu") +
   theme(axis.text.x = element_text(angle = 90))
 
-#outcome by ...
-dfPerson
-dfStudentInfo
-dfAnswers
+plot.answers(dfStudentInfo, 'archetype')
+plot.answers(dfStudentInfo, 'role')
+plot.answers(dfStudentInfo, 'team_role')
+plot.answers(dfStudentInfo, 'user_role')
+plot.answers(dfPerson, 'left')
+plot.answers(dfPerson, 'gender')
+plot.answers(dfPerson, 'country')
+plot.answers(dfPerson, 'age_range')
+plot.answers(dfPerson, 'highest_education_level')
+plot.answers(dfPerson, 'employment_status')
+plot.answers(dfPerson, 'employment_area')
+plot.answers(dfPerson, 'detected_country')
 
-#archetype
-df = left_join(dfStudentInfo, dfAnswers, by = c("learner_id" = "learner_id"))
-df <- select(df, learner_id, archetype, quiz_question, correct)
-df <- df %>% drop_na(archetype)
-df <- df %>% drop_na(correct)
-#summary(df)
-ggplot(data = df, aes(fill=correct, x = archetype)) +
-  geom_bar() +
-  labs(title="Question Outcome by Archetype", y="Count", x = "Archetype") + 
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu") +
-  theme(axis.text.x = element_text(angle = 90))
-
-#highest educational achievement
-df = left_join(dfPerson, dfAnswers, by = c("learner_id" = "learner_id"))
-df <- select(df, learner_id, highest_education_level , quiz_question, correct)
-df <- filter(df, df$highest_education_level != "Unknown")
-df <- df %>% drop_na(highest_education_level)
-df <- df %>% drop_na(correct)
-ggplot(data = df, aes(fill=correct, x = highest_education_level )) +
-  geom_bar() +
-  labs(title="Question Outcome by Highest Educational Level", y="Count", x = "Archetype") + 
-  theme_bw() + 
-  scale_fill_brewer(palette="PuBu") +
-  theme(axis.text.x = element_text(angle = 90))
 
 #videos
 dfVSDevice
@@ -202,6 +115,7 @@ dfVSLocationPivot
 dfVSTotals
 dfVSTotalsPivot
 
+#video views
 ggplot(data = dfVSTotalsPivot, aes(fill=percentviewed, y = count, x = as.character(step_position))) +
   geom_bar(stat="identity", position="dodge") +
   labs(title= "Views by Video Completion", y="Views", x = "Video") + 
@@ -227,28 +141,69 @@ ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.chara
   theme_bw() + 
   theme(axis.text.x = element_text(angle = 90))
 
-#continuous data in entire dataset
 
-#Student Info - Enrolled length of time
-dfStudentInfo$totalEnrolledTime = difftime(dfStudentInfo$unenrolled_at, 
-                                           dfStudentInfo$enrolled_at, 
-                                           units="days") #calculate the difference
-summary(dfStudentInfo$totalEnrolledTime)
+#continuous data in entire dataset
+#get the time enrolled
 df <- dfStudentInfo %>% drop_na(totalEnrolledTime)
-df <- filter(dfStep, timeToComplete !=0) 
-df$totalEnrolledTime
+df <- filter(df, totalEnrolledTime !=0) 
 df <- select(df, learner_id, enrolled_at, unenrolled_at, totalEnrolledTime)
-summary(df)
-dim(df)
-head(df) #4364 rows
-#are people who were enrolled longer more likely to leave without finishing the course?
-#how do we define finshing the course? Completing the last step
+df$totalEnrolledTime = as.double(round(df$totalEnrolledTime, digits=0))
+
+#get the steps passed
+dfCompletedSteps = filter(dfStep, isComplete==TRUE)
+dfCompletedSteps$step = as.character(dfCompletedSteps$step)
+
+#group by learner_id and count
+dfTotalStepsByLearner = count(dfCompletedSteps, learner_id)
+dfStepsByLearner = count(dfCompletedSteps, learner_id, step)
+summary(dfTotalStepsByLearner)
+summary(dfStepsByLearner)
+
+
+
+all.rows(filter(dfCompletedSteps, learner_id == '005b9875-6783-4b4c-aad0-1342b12593bb'))
+all.rows(filter(dfStep, learner_id == '005b9875-6783-4b4c-aad0-1342b12593bb'))
+all.rows(filter(dfSA, learner_id == '77454a73-6b8b-46a2-8dee-35f36b6c4fc1'))
+count(dfSA, learner_id)
+arrange(count(dfSA, learner_id), desc(n))
+#mutiple enrollments, 300 roles - what i have caled stage_id is better called a cohort id. 
+
+ggplot(data = dfTotalStepsByLearner, aes(x = n)) +
+  geom_bar() + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu", name="Device") +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(data = dfStepsByLearner, 
+       aes(x = step)) +
+  geom_bar() + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu", name="Device") +
+  theme(axis.text.x = element_text(angle = 90))
+
+#geom_point()
+
+#join the data
+#join the answers data
+dfTimeEnrolledVsSteps = left_join(df, dfTotalStepsByLearner, by = c("learner_id" = "learner_id"))
+dfTimeEnrolledVsSteps <- dfTimeEnrolledVsSteps %>% drop_na(n)
+
+ggplot(data = dfTimeEnrolledVsSteps, aes(x = totalEnrolledTime)) +
+  geom_bar() + 
+  ylim(0, 30)
+  #geom_point()
+
+
 
 #Step time to complete
 summary(dfStep$timeToComplete)
 df <- filter(dfStep, timeToComplete !=0) #29075 rows due to lack of first_visited_at and last_completed_at data
 
-dfVideoX is the continuous data.
+
+#continuous video data by categorical data
+
+
+
 #Investigate if there is any relationship between archetype and views, or drop out rate.
 #Investigate any relationship between views and leavers
 #Investigate any relationship between sentiment, views and leavers

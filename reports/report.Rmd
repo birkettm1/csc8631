@@ -311,24 +311,161 @@ Particularly, it was identified that some feature engineering could be carried o
    dfVSTotalsPivot
   ```
 
-To support the next iteration I have merged the Team Member, Archetype and Enrollment data sets to create separate Person and Student Info datasets, these are related on Learner_ID. Person contains details about the person including age, age_range, education level. StudentInfo contains student centric information such as enrollment dates and various roles, archetypes etc. I have also slimmed down the Step and Answers datasets. We are now left with the following structure to go into iteration 2.
+\newpage
+### Iteration 2
+Throughout iteration 1 a hypothesis to investigate has not become clear.
+
+#### Business Understanding
+The dataset it principally a collection of categorical data which could be investigated of which nothing leaps out at this time. I suggest that the objective to accomplish to to amass a greater understanding of the data and success looks like some interesting avenues to investigate.A hypothesis may become clearer during the data understanding and preparation phases.
+
+A successful project would outline more than one avenue for further exploration with an indication of what may be found. Continuous data is available via the Video View data which may be of further interest to investigate from a complexity point of view. 
+
+The risks of such an approach are that nothing leaps out of interest or for further analysis. However, this is a valuable finding in itself.
+
+#### Data Understanding
+To support the this iteration I felt that I needed to review the data sources and further investigate the structure. It was found that the Archetype and Team Member data sets which had been missed in iteration 1. Upon further investigation it was found that they relate to Enrollment on Learner_ID on a 1 to 1 basis. Therefore I have merged the Team Member, Archetype and Enrollment data sets to create separate Person and Student Info data sets, these are related on Learner_ID. 
+
+```{r enrollmentTransforms, echo=true, results='hide'}
+#create dfStudent and person from enrollments, archetypes, team members
+dfStudent <- left_join(dfE, dfAR, by = c("learner_id" = "learner_id")) #enrollment
+dfStudentTM <- left_join(dfStudent, dfTM, by = c("learner_id" = "learner_id")) #team member
+dfStudentLeavers <- left_join(dfStudentTM, dfLSR, by = c("learner_id" = "learner_id")) #leavers
+dfStudentLeavers$left = !is.na(dfStudentLeavers$last_completed_step) #set leaver flag
+```
+
+This gave me a complete dataset regarding the students which I subsequently split into Student Info and Person data sets, I also flagged any leavers to allow this to be easily visualised.
+
+```{r enrollmentSplit, echo=true, results='hide'}
+#select out two tables
+dfStudentInfo = select(dfStudentLeavers, learner_id, enrolled_at, unenrolled_at,
+                  fully_participated_at, purchased_statement_at, 
+                  archetype, role, team_role, user_role)
+
+dfPerson = select(dfStudentLeavers, learner_id, gender, country, age_range, 
+                   highest_education_level, employment_status, employment_area,
+                   detected_country, left)
+```
+
+Person contains details about the person including age, age_range, education level. Student Info contains student centric information such as enrollment dates and various roles, archetypes etc. I have also slimmed down the Step and Answers data sets. 
+
+```{r slimStepAnswers, echo=FALSE, out.width="75%", fig.cap="Step and Answers Data"}
+#steps
+head(dfStep)
+
+#answers
+head(dfAnswers)
+
+```
+
+We are now left with the following structure which I am confident can be correctly queried.
 
 ![Relationships between data frames.](transformedERD.png "Transformed Entity Relationship Diagram"){width=75%}
 
+These transformations were subsequently loaded into the analysis tool, and an extra step was added to the munge process to handle these transformations.
 
-### Iteration 2
-Look at a hypotheses and repeat the steps as outlined in the introduction. Look into test results as we have a lot of data about it, relate to time in the course and leavers.
+\newpage
+__People and Students__
+My initial investigation queried the categorical data regarding people and students. Each categorical item was plotted on a bar chart with "Unknown" removed to give allow a reasonable view on the rest of the data. As identified in iteration 1 unknown makes up the vast quantity of this data. Students split by gender is roughly a 50 / 50 split, country offers GB as the clear leader where the data is known, age range offers 26-35 as the most common group, but get a general spread over all range other than under 18. So far so predictable. The only clear outliers to give any kind of insight into the type of student attracted is:
 
-#### Business Understanding - Hypothesis
+* Highest education = University degree
+* Employment Status = Working full time
+* Employment area = IT and Information Services
+
+Detected country also found GB to do the most common value after Unknown. However, students would travel to take part in their course so this may be artificially bloated. So we have learned that individuals taking a cyber security course generally work in IT, full time, and the gateway to such a career is a university degree.
+
+Of potential more interest in the multiple roles for each student. We can see that there is a clear number of vitalisers over the other archetypes, and very few flourishes and hobbyists. This is shown in the figure below.
+
+```{r studentsBy, echo=FALSE, out.width="100%", fig.cap="Student by Archetype and Team Role"}
+plot1 <- plot.enrollment(dfStudentInfo[,c(1,6)], 'archetype') #archetype
+plot2 <- plot.enrollment(dfStudentInfo[,c(1,8)], 'team_role') 
+grid.arrange(plot1, plot2, ncol=2)
+
+```
+
+The vast majority of students on the course are learners rather than admins and the team roles reflect educator and host being the team roles.  Those don't particularly sound like student roles and the  trifling numbers in each role could also reflect this. Some investigation of archetype vs team roles in further iterations could be of interest.
+
+\newpage
+__Course Progress__
+I adopted the completed steps of the course to reflect course progress, the completed date had already been used to indicate a completed step. When counting the number of completed steps across all cohorts as per the chart below, you can see the numbers are significant. It can also be seen that 1.1 is the most completed step by far, and the completed steps across the week reduces. There is then a spike at the beginning of the next week and so on until the end of the course. 
+
+```{r courseProgress, echo=FALSE, out.width="100%", fig.cap="Completed Steps"}
+#completed steps - raw counts
+dfCompletedSteps = filter(dfStep, isComplete==TRUE)
+dfCompletedSteps$step = as.character(dfCompletedSteps$step)
+ggplot(data = dfCompletedSteps, aes(x = step)) +
+  geom_bar() +
+  labs(title="Completed Steps", y="Count", x = "Step") + 
+  theme_bw() + 
+  scale_fill_brewer(palette="PuBu") + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+The numbers completing the final step are significantly lower than those starting which could signify a high drop out rate, however, the numbers look generally high so this will be revisited.
+
+Course progress was then revisited by the same categorical variables as those use for students outlined previously. Course progress by team role indicated some interesting number as per the figure below, this was also cross referenced with organisation admin.
+
+```{r progressTeamUser, echo=FALSE, out.width="100%", fig.cap="Progress by Team and User Roles"}
+plot1 <- plot.progress(dfStudentInfo, 'team_role')
+plot2 <- plot.progress(dfStudentInfo, 'user_role') 
+grid.arrange(plot1, plot2, ncol=2)
+```
 
 
-#### Data Understanding
+The large number of incomplete steps against each team role at first indicated that team roles aren't associated with learners, but are more likely to be associated with organisation admin. the user role graph does indicate a lot of incomplete steps for the admin roles, but surprisingly, also for the user roles when i would have expected this to be higher. Also the count of steps against the admin roles appear to be exceptionally large at this point. I became concerned at the quality of the steps data so this would be revisited in the data preparation step of this task.
 
+While investigating this data I investigated course project by highest education level, wondering if those that had already achieved highly academically would show a clear difference in the number  of completed steps, in the hopes this would yield an avenue to build a hypothesis.
 
+```{r progressEducationLevel, echo=FALSE, out.width="100%", fig.cap="Progress by User Role"}
+plot.progress(dfPerson, 'highest_education_level')
+```
+As can be seen in the figure above this was not the case, although those at a higher educational attainment had completed more steps, in my opinion this merely confirmed an earlier finding that more students had those educational attainment, although this could be investigated further.
+
+\newpage
+__Question Answers__
+Inclusion of the question and answers data, allowed me to investigate the number of questions answered, and the result. I would also be able to link this to step data via the feature engineered "step" number in the question data set, however, my concerns above regarding the quality of that data meant that was left for a potential later iteration. I was however able to investigate the number of questions which students had attempted to answer and what the outcome was, as per the figure below.
+
+```{r answeredQuestions, echo=FALSE, out.width="100%", fig.cap="Questioned Answered with Result"}
+  df = dfAnswers %>% group_by(quiz_question) %>% count(dfAnswers$correct)
+  colnames(df) <- c('Quiz_Question', 'Correct', 'Count')
+  ggplot(data = df, aes(fill=Correct, x = Quiz_Question, y=Count)) +
+    geom_bar(stat="identity") +
+    labs(title="Question Result", y="Count", x = "Question Number") + 
+    theme_bw() + 
+    scale_fill_brewer(palette="PuBu") +
+    theme(axis.text.x = element_text(angle = 90))
+```
+It can be seen that the attempts at answering the quiz questions vary wildly throughout the course, although there is some consistency between the numbers of correct answers. Week three quiz attempts and correct answers are markedly lower. Revisiting the potential earlier hypothesis regarding highest education level of the student did not show a greater percentage of correct answers, indeed, it was again just a reflection on the volume of students as show in the figure below.
+
+```{r answerByEducation, echo=FALSE, out.width="100%", fig.cap="Questioned Answered with Result"}
+plot.answers(dfPerson, 'highest_education_level')
+```
+
+At this point I chose to investigate the step data set which looked excessive. This was revisited in the data preparation task.
+
+}
+
+\newpage
 #### Data Preparation
+<!--3. Data Preparation - prepare the final data sets for modelling.
+  + Determine which data set to be used and reasons for inclusion / exclusion.
+  + Clean the data
+  + Construct data, carry out any required feature engineering.
+  + Integrate data, create new data sets by combining data sources
+  + Re-format data as necessary, cast data types as required.-->
 
+<!-- continuous data preparations re: time enrolled and steps passed -->
+<!-- the file number is a cohort -->
 
 ### Conclusions
+Team Role vs Archetypes - do archetypes reflect the student cohort and team roles the teaching staff?
+
+Do students with previous higher attainment complete more steps of the course successfully? Or does the data merely prove there is more of them on the course?
+
+Questions and Answers could be related to Steps and therefore Students to get greater insight on student results. If we were happy with the step data.
+
+I had failed to take into account an idea of a student cohort when i imported the data. If i had asked that question earlier in the project the data would have made more sense.
+
+The range of new skills and approaches during this assignment and unit was so wide and detailed I feel like i have barely scratched the surface. However, time is against me.
 
 ### References
 Data Science Alliance, 2021, What is CRISP-DM, https://www.datascience-pm.com/crisp-dm-2/, Accessed: 26/11/2021
