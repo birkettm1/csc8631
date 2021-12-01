@@ -9,14 +9,14 @@ dfStudentLeavers$left = !is.na(dfStudentLeavers$last_completed_step) #set leaver
 #select out two tables
 dfStudentInfo = select(dfStudentLeavers, learner_id, enrolled_at, unenrolled_at,
                        fully_participated_at, purchased_statement_at, 
-                       archetype, role, team_role, user_role)
+                       archetype, role, team_role, user_role, stage_id.x)
 
 dfPerson = select(dfStudentLeavers, learner_id, gender, country, age_range, 
                   highest_education_level, employment_status, employment_area,
                   detected_country, left)
 
 #steps
-dfStep = select(dfSA, learner_id, step, step_number, isComplete, timeToComplete)
+dfStep = select(dfSA, learner_id, stage_id, step, step_number, isComplete, timeToComplete)
 
 #answers
 dfAnswers = select(dfQR, learner_id, step, week_number, quiz_question, response, submitted_at, correct)

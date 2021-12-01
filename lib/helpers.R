@@ -71,7 +71,7 @@ plot.enrollment = function(data, column){
   title <- paste("Students by", column, sep=" ")
   
   #tidy data
-  df <- data %>% drop_na(column)
+  df <- data %>% drop_na(all_of(column))
   df <- filter(df, !!sym(column) != "Unknown")
   
   #create the plot

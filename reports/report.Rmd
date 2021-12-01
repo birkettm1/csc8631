@@ -453,19 +453,91 @@ At this point I chose to investigate the step data set which looked excessive. T
   + Integrate data, create new data sets by combining data sources
   + Re-format data as necessary, cast data types as required.-->
 
-<!-- continuous data preparations re: time enrolled and steps passed -->
-<!-- the file number is a cohort -->
+During the data understanding task I established that the step data I was working with did not seem to be correct, there was a lot of data and what seemed to be an unfeasible amount of steps per student, given that this is only a three week course. I also wanted to explore some continuous data as the majority of data explored so far had been categorical.
+
+I established that most of the continuous data in the complete dataset was regarding video views. This dataset is a count of view by various metrics againt each video in the step. However, given that I hadn't particularly explored it I was keen to use a some data I had viewed previously. In the student info dataset I had enrolled and un enrolled dates and use this to feature engineer a total enrolled time metric per student, expressed as enrolled date - un enrolled date, in days. I then attempted to correlate the enrolled time against the number of steps completed. This left me with 4374 students to work with and 385558 completed steps, a ratio of 1 to 88.147, which is larger than the unique steps in the course, at 58. The workings are shown in the next figure.
+
+```{r stepAndEnrollmentWorkings, echo=true, results='hide'}
+  #continuous data in entire dataset
+  #get the time enrolled
+  df <- dfStudentInfo %>% drop_na(totalEnrolledTime)
+  df <- filter(df, totalEnrolledTime !=0) 
+  df <- select(df, learner_id, enrolled_at, unenrolled_at, totalEnrolledTime)
+  df$totalEnrolledTime = as.double(round(df$totalEnrolledTime, digits=0))
+  count(df) #4374
+  
+  #get the steps passed
+  dfCompletedSteps = filter(dfStep, isComplete==TRUE)
+  dfCompletedSteps$step = as.character(dfCompletedSteps$step)
+  count(dfCompletedSteps) #385558
+  
+  #unique steps
+  length(unique(dfStep$step)) #58
+```
+
+To investigate I created some plots showing total steps by learner which was a count of steps completed against learner id, were giving me count of up to approximately 1500, so i chose to query the data more directly as per below.
+
+```{ r countOfStepsByLearnerByStep, echo=FALSE, out.width="100%", fig.cap="Completed Steps by Learner and Step"}
+  #group by learner_id and count
+  dfStepsByLearner = count(dfCompletedSteps, learner_id, step)
+  arrange(dfStepsByLearner, desc(n), learner_id)
+```
+
+This count of steps by learner shows multiple rows of the same learner_id, i.e one per step, but it also shows multiple enrollments on that step. This is a clear difference to what i assumed that the data would be, to check this i removed the step number from the count and then also queried the original data as per the figure below.
+
+```{r countOfStepsByLearner, echo=FALSE, out.width="100%", fig.cap="Completed Steps by Learner"}
+  dfTotalStepsByLearner = count(dfCompletedSteps, learner_id)
+  arrange(dfTotalStepsByLearner, desc(n))
+  arrange(count(dfSA, learner_id), desc(n))
+```
+
+As can be seen there are a lot of learners with an unfeasible amount of steps for a 3 week course with a max of 58 steps. The highest number of 183 is approximately 3 times the maximum of the course. It can also be seen that the same issue is seen in the original data, with a maximum of 304 steps, 5.2 times the maximum steps on the course. Since the issue was in the original data I concluded that I had not made any relational errors in creating my data tables, my misunderstanding was on the import from the source files into R in my munge process.
+
+The original data had been provided in 7 data files where the number had been provided in the filename. Given that this was more than the 5 times of some data for some students i hadn't expected see i decided to investigate whether i had multiple enrollments across files. For want of a better phrase I had added that value into the source data table as "stage_id", and then has used it no further. 
+
+To explore this the stage_id was added to munge step for both the enrollment data and the step data. I then visualised completed steps and enrollment against the stage id.
+
+```{r countOfStepsByLearner, echo=FALSE, out.width="100%", fig.cap="Completed Steps by Learner"}
+
+ggplot(data = df, aes(x = stage_id.x)) +
+  geom_bar() + 
+  theme_bw() + 
+  labs(title= "Enrollments against Stage", y="Count", x = "Stage ID") +  
+  scale_fill_brewer(palette="PuBu", name="Device") +
+  theme(axis.text.x = element_text(angle = 90))
+
+arrange(select(df, learner_id, stage_id.x), learner_id, stage_id.x)
+```
+You can see from the figure above that there are multiple enrollments against each stage. Which possibly indicates late joiners to the course. By sorting the data by learner and stage it can also be seen that there are multiple enrollments of the same learner across all stages but not all students enrolled on each stage, this has introduced multiplicity which should have been found in the previous iteration
+
+```{r countOfStepsByLearner, echo=FALSE, out.width="100%", fig.cap="Completed Steps by Learner"}
+
+#steps against stage_id
+ggplot(data = dfCompletedSteps, aes(x = stage_id)) +
+  geom_bar() + 
+  theme_bw() + 
+  labs(title= "Completed Steps against Stage", y="Count", x = "Stage ID") +  
+  scale_fill_brewer(palette="PuBu", name="Device") +
+  theme(axis.text.x = element_text(angle = 90))
+
+
+arrange(select(dfCompletedSteps, learner_id, stage_id, step), learner_id, stage_id)
+
+```
+As you can see from the figure above there is also multiple steps against each stage, and there are steps per learner per stage. This also introduces multiplicity in the visualisations.
+
+The stage_id would perhaps have been better referred to as Cohort ID, this finding would improve the dataset in any subsequent iteraton of this data exploration.
 
 ### Conclusions
-Team Role vs Archetypes - do archetypes reflect the student cohort and team roles the teaching staff?
+The second iteration provided a couple of potential avenues for exploration, even though it only examined half of the dataset. Particularly:
 
-Do students with previous higher attainment complete more steps of the course successfully? Or does the data merely prove there is more of them on the course?
+1. Team Role vs Archetypes - do archetypes reflect the student cohort and team roles the teaching staff?
 
-Questions and Answers could be related to Steps and therefore Students to get greater insight on student results. If we were happy with the step data.
+2. Do students with previous higher attainment complete more steps of the course successfully? Or does the data merely prove there is more of them on the course?
 
-I had failed to take into account an idea of a student cohort when i imported the data. If i had asked that question earlier in the project the data would have made more sense.
+3. Questions and Answers could be related to Steps and therefore Students to get greater insight on student results. 
 
-The range of new skills and approaches during this assignment and unit was so wide and detailed I feel like i have barely scratched the surface. However, time is against me.
+What we learned from Iteration two is that I had failed to take into account an idea of a student cohort when I imported the data. If i had asked that question earlier in the project the data would have made more sense. The range of new skills and approaches during this assignment and unit was so wide and detailed I feel like i have barely scratched the surface. However, time is against me.
 
 ### References
 Data Science Alliance, 2021, What is CRISP-DM, https://www.datascience-pm.com/crisp-dm-2/, Accessed: 26/11/2021

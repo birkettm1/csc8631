@@ -146,34 +146,54 @@ ggplot(data = dfVSLocationPivot, aes(fill=percentviewed, y = count, x = as.chara
 #get the time enrolled
 df <- dfStudentInfo %>% drop_na(totalEnrolledTime)
 df <- filter(df, totalEnrolledTime !=0) 
-df <- select(df, learner_id, enrolled_at, unenrolled_at, totalEnrolledTime)
+df <- select(df, learner_id, enrolled_at, unenrolled_at, totalEnrolledTime, stage_id.x)
 df$totalEnrolledTime = as.double(round(df$totalEnrolledTime, digits=0))
+count(df)
 
 #get the steps passed
 dfCompletedSteps = filter(dfStep, isComplete==TRUE)
 dfCompletedSteps$step = as.character(dfCompletedSteps$step)
+count(dfCompletedSteps)
+
+#unique steps
+length(unique(dfStep$step))
 
 #group by learner_id and count
-dfTotalStepsByLearner = count(dfCompletedSteps, learner_id)
 dfStepsByLearner = count(dfCompletedSteps, learner_id, step)
-summary(dfTotalStepsByLearner)
-summary(dfStepsByLearner)
+arrange(dfStepsByLearner, desc(n), learner_id)
 
-
+dfTotalStepsByLearner = count(dfCompletedSteps, learner_id)
+arrange(dfTotalStepsByLearner, desc(n))
+arrange(count(dfSA, learner_id), desc(n))
 
 all.rows(filter(dfCompletedSteps, learner_id == '005b9875-6783-4b4c-aad0-1342b12593bb'))
 all.rows(filter(dfStep, learner_id == '005b9875-6783-4b4c-aad0-1342b12593bb'))
 all.rows(filter(dfSA, learner_id == '77454a73-6b8b-46a2-8dee-35f36b6c4fc1'))
-count(dfSA, learner_id)
-arrange(count(dfSA, learner_id), desc(n))
-#mutiple enrollments, 300 roles - what i have caled stage_id is better called a cohort id. 
 
-ggplot(data = dfTotalStepsByLearner, aes(x = n)) +
+
+#mutiple enrollments, 300 roles - what i have called stage_id is better called a cohort id. 
+#enrollments against stage_id
+ggplot(data = df, aes(x = stage_id.x)) +
   geom_bar() + 
   theme_bw() + 
+  labs(title= "Enrollments against Stage", y="Count", x = "Stage ID") +  
   scale_fill_brewer(palette="PuBu", name="Device") +
   theme(axis.text.x = element_text(angle = 90))
 
+arrange(select(df, learner_id, stage_id.x), learner_id, stage_id.x)
+
+#steps against stage_id
+ggplot(data = dfCompletedSteps, aes(x = stage_id)) +
+  geom_bar() + 
+  theme_bw() + 
+  labs(title= "Completed Steps against Stage", y="Count", x = "Stage ID") +  
+  scale_fill_brewer(palette="PuBu", name="Device") +
+  theme(axis.text.x = element_text(angle = 90))
+
+arrange(select(dfCompletedSteps, learner_id, stage_id, step), learner_id, stage_id)
+
+
+#steps by learner
 ggplot(data = dfStepsByLearner, 
        aes(x = step)) +
   geom_bar() + 
