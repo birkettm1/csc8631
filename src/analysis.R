@@ -1,47 +1,11 @@
-
 library('ProjectTemplate'); 
+setwd("C:/DevProjects/csc8631") #add your working directory here
 load.project()
 
 
-#business understanding, data understanding, data preparation, modelling, evaluation
+#analysis of each data source is in the files in /src
 
-#iteration 1
-#Import - load 5 data frames - munge folder files 1 to 6
-head(dfE) #enrollments #pk is id
-head(dfTM) #team members #pk is id
-head(dfAR) #archetype responses #pk is id
-head(dfSA) #step activity
-head(dfQR) #question response #pk is id
-head(dfLSR) #leaving survey #pk is id
-head(dfVS) #video stats #pk is id
-head(dfSS) #sentiment survey #pk is id
-
-#Tidy
-
-#dfQR$question_number - does that relate somewhere
-#dfLSR has last_completed_step and last_completed_step_number - does that relate into step_number at $dfSA_step_number
-#dfQR$step_number - does that relate to dfSA$step_number
-#dfTM has person names and roles with learner_id can this be related on id?
-#dfSA$step (1.1) looks like it relates to  dfVS$step_position
-
+#iteration2 is in /src/iteration2.R
 
 #create a diagram of the relationships between tables
 create.erd.flowchart()
-
-#(Visualise > Model > Transform) 
-
-#2 data sources
-plot(movies$length, movies$rating)
-#categorical
-barplot(table(categorical))
-#continuous
-hist(continuous)
-boxplot(continuous ~ categorical)
-
-
-
-
-
-#Understand 
-
-#Communicate

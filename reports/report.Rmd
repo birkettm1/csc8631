@@ -184,12 +184,12 @@ par(mfrow=c(1,1))
   
   * __Data Quality__ - Upon import it was necessary to standardise the data type across multiple files, id was cast to integer, last completed step to character and the last completed step and week numbers to integer. All date times were also cast to date time. Upon investigation of the data it was found that there were multiple leaving reasons which amounted to "lack of time" (Figure 1), this field was merged to make it comparable to other values (Figure 2)
   
-  ```{r reasonsForLeaving, echo=FALSE, out.width="75%", fig.cap="Native Reasons for Leaving"}
+  ```{r reasonsForLeaving, echo=FALSE, out.width="100%", fig.cap="Native Reasons for Leaving"}
     table(dfLSR$leaving_reason)
   ```
   Once corrected the data is comparable as per below.
   
-  ```{r reasonsForLeavingEngineered, echo=FALSE, out.width="75%", fig.cap="Engineered Reasons for Leaving"}
+  ```{r reasonsForLeavingEngineered, echo=FALSE, out.width="100%", fig.cap="Engineered Reasons for Leaving"}
     barplot(table(dfLSR$reason)
           , main="Reasons for Leaving"
           , xlab="Reason"
@@ -206,7 +206,7 @@ par(mfrow=c(1,1))
 
   * __Data Quality__ - Simple data quality checks were carried out which showed the correct data types, and that Cloze_Response is always null. A review of week_number, step_number and question_number confirmed that they could be concatenated to form the tables primary key and a step key, as per Figure 4 below, "Question Response Key Construct".
     
-```{r qrKeys, echo=FALSE, out.width="75%", fig.cap="Question Response Key Construct"}
+```{r qrKeys, echo=FALSE, out.width="100%", fig.cap="Question Response Key Construct"}
 dfQRNumbers <- select(dfQR, quiz_question, week_number, step_number, question_number)
 dfQRNumbers <- group_by(dfQRNumbers)
 dfQRNumbers <- dfQRNumbers %>%
@@ -240,7 +240,7 @@ It can be clearly seen that concatenating the columns gives us the key.
 
 The relationships between data sets as discussed above are documented below.
 
-![Relationships between data frames.](erd.png "Entity Relationship Diagram"){width=75%}
+![Relationships between data frames.](erd.png "Entity Relationship Diagram"){width=50%}
 
 #### Data Preparation
 Each set of data was imported into a dataframe during the data understanding stage. This was done by filtering the file set and reading the contents of each file to a list. This was then bound by Dplyr. The example below binds all *question.response.csv files into a dataframe.
@@ -307,11 +307,10 @@ Particularly, it was identified that some feature engineering could be carried o
 
   The formatted data for reporting is as per below.
 
-  ```{r pivottedViews, echo=FALSE, out.width="75%", fig.cap="Tranformed Video View Data"}
+  ```{r pivottedViews, echo=FALSE, out.width="100%", fig.cap="Tranformed Video View Data"}
    dfVSTotalsPivot
   ```
 
-\newpage
 ### Iteration 2
 Throughout iteration 1 a hypothesis to investigate has not become clear.
 
@@ -339,7 +338,7 @@ This gave me a complete dataset regarding the students which I subsequently spli
 #select out two tables
 dfStudentInfo = select(dfStudentLeavers, learner_id, enrolled_at, unenrolled_at,
                   fully_participated_at, purchased_statement_at, 
-                  archetype, role, team_role, user_role)
+                  archetype, role, team_role, user_role, stage_id.x)
 
 dfPerson = select(dfStudentLeavers, learner_id, gender, country, age_range, 
                    highest_education_level, employment_status, employment_area,
@@ -348,7 +347,7 @@ dfPerson = select(dfStudentLeavers, learner_id, gender, country, age_range,
 
 Person contains details about the person including age, age_range, education level. Student Info contains student centric information such as enrollment dates and various roles, archetypes etc. I have also slimmed down the Step and Answers data sets. 
 
-```{r slimStepAnswers, echo=FALSE, out.width="75%", fig.cap="Step and Answers Data"}
+```{r slimStepAnswers, echo=FALSE, out.width="100%", fig.cap="Step and Answers Data"}
 #steps
 head(dfStep)
 
@@ -359,11 +358,10 @@ head(dfAnswers)
 
 We are now left with the following structure which I am confident can be correctly queried.
 
-![Relationships between data frames.](transformedERD.png "Transformed Entity Relationship Diagram"){width=75%}
+![Relationships between data frames.](transformedERD.png "Transformed Entity Relationship Diagram"){width=50%}
 
 These transformations were subsequently loaded into the analysis tool, and an extra step was added to the munge process to handle these transformations.
 
-\newpage
 __People and Students__
 My initial investigation queried the categorical data regarding people and students. Each categorical item was plotted on a bar chart with "Unknown" removed to give allow a reasonable view on the rest of the data. As identified in iteration 1 unknown makes up the vast quantity of this data. Students split by gender is roughly a 50 / 50 split, country offers GB as the clear leader where the data is known, age range offers 26-35 as the most common group, but get a general spread over all range other than under 18. So far so predictable. The only clear outliers to give any kind of insight into the type of student attracted is:
 
@@ -402,7 +400,7 @@ ggplot(data = dfCompletedSteps, aes(x = step)) +
 
 The numbers completing the final step are significantly lower than those starting which could signify a high drop out rate, however, the numbers look generally high so this will be revisited.
 
-Course progress was then revisited by the same categorical variables as those use for students outlined previously. Course progress by team role indicated some interesting number as per the figure below, this was also cross referenced with organisation admin.
+Course progress was then revisited by the same categorical variables as those use for students outlined previously. Course progress by team role indicated some interesting number as per the figure below, this was also cross referenced with organisation admin. As per figure 7 below, the large number of incomplete steps against each team role at first indicated that team roles aren't associated with learners, but are more likely to be associated with organisation admin. the user role graph does indicate a lot of incomplete steps for the admin roles, but surprisingly, also for the user roles when i would have expected this to be higher. Also the count of steps against the admin roles appear to be exceptionally large at this point. I became concerned at the quality of the steps data so this would be revisited in the data preparation step of this task.
 
 ```{r progressTeamUser, echo=FALSE, out.width="100%", fig.cap="Progress by Team and User Roles"}
 plot1 <- plot.progress(dfStudentInfo, 'team_role')
@@ -411,16 +409,6 @@ grid.arrange(plot1, plot2, ncol=2)
 ```
 
 
-The large number of incomplete steps against each team role at first indicated that team roles aren't associated with learners, but are more likely to be associated with organisation admin. the user role graph does indicate a lot of incomplete steps for the admin roles, but surprisingly, also for the user roles when i would have expected this to be higher. Also the count of steps against the admin roles appear to be exceptionally large at this point. I became concerned at the quality of the steps data so this would be revisited in the data preparation step of this task.
-
-While investigating this data I investigated course project by highest education level, wondering if those that had already achieved highly academically would show a clear difference in the number  of completed steps, in the hopes this would yield an avenue to build a hypothesis.
-
-```{r progressEducationLevel, echo=FALSE, out.width="100%", fig.cap="Progress by User Role"}
-plot.progress(dfPerson, 'highest_education_level')
-```
-As can be seen in the figure above this was not the case, although those at a higher educational attainment had completed more steps, in my opinion this merely confirmed an earlier finding that more students had those educational attainment, although this could be investigated further.
-
-\newpage
 __Question Answers__
 Inclusion of the question and answers data, allowed me to investigate the number of questions answered, and the result. I would also be able to link this to step data via the feature engineered "step" number in the question data set, however, my concerns above regarding the quality of that data meant that was left for a potential later iteration. I was however able to investigate the number of questions which students had attempted to answer and what the outcome was, as per the figure below.
 
@@ -434,31 +422,22 @@ Inclusion of the question and answers data, allowed me to investigate the number
     scale_fill_brewer(palette="PuBu") +
     theme(axis.text.x = element_text(angle = 90))
 ```
-It can be seen that the attempts at answering the quiz questions vary wildly throughout the course, although there is some consistency between the numbers of correct answers. Week three quiz attempts and correct answers are markedly lower. Revisiting the potential earlier hypothesis regarding highest education level of the student did not show a greater percentage of correct answers, indeed, it was again just a reflection on the volume of students as show in the figure below.
-
-```{r answerByEducation, echo=FALSE, out.width="100%", fig.cap="Questioned Answered with Result"}
-plot.answers(dfPerson, 'highest_education_level')
-```
+It can be seen that the attempts at answering the quiz questions vary wildly throughout the course, although there is some consistency between the numbers of correct answers. Week three quiz attempts and correct answers are markedly lower. 
 
 At this point I chose to investigate the step data set which looked excessive. This was revisited in the data preparation task.
 
-}
-
-\newpage
 #### Data Preparation
-<!--3. Data Preparation - prepare the final data sets for modelling.
-  + Determine which data set to be used and reasons for inclusion / exclusion.
-  + Clean the data
-  + Construct data, carry out any required feature engineering.
-  + Integrate data, create new data sets by combining data sources
-  + Re-format data as necessary, cast data types as required.-->
-
 During the data understanding task I established that the step data I was working with did not seem to be correct, there was a lot of data and what seemed to be an unfeasible amount of steps per student, given that this is only a three week course. I also wanted to explore some continuous data as the majority of data explored so far had been categorical.
 
-I established that most of the continuous data in the complete dataset was regarding video views. This dataset is a count of view by various metrics againt each video in the step. However, given that I hadn't particularly explored it I was keen to use a some data I had viewed previously. In the student info dataset I had enrolled and un enrolled dates and use this to feature engineer a total enrolled time metric per student, expressed as enrolled date - un enrolled date, in days. I then attempted to correlate the enrolled time against the number of steps completed. This left me with 4374 students to work with and 385558 completed steps, a ratio of 1 to 88.147, which is larger than the unique steps in the course, at 58. The workings are shown in the next figure.
+I established that most of the continuous data in the complete dataset was regarding video views. This dataset is a count of view by various metrics against each video in the step. However, given that I hadn't particularly explored it I was keen to use a some data I had viewed previously. In the student info dataset I had enrolled and un enrolled dates and use this to feature engineer a total enrolled time metric per student, expressed as enrolled date - un enrolled date, in days. I then attempted to correlate the enrolled time against the number of steps completed. This left me with 4374 students to work with and 385558 completed steps, a ratio of 1 to 88.147, which is larger than the unique steps in the course, at 58. The workings are shown in the next figure.
 
 ```{r stepAndEnrollmentWorkings, echo=true, results='hide'}
-  #continuous data in entire dataset
+  
+  #Student Info - Enrolled length of time
+  dfStudentInfo$totalEnrolledTime = difftime(dfStudentInfo$unenrolled_at, 
+                                           dfStudentInfo$enrolled_at, 
+                                           units="days") #calculate the difference
+
   #get the time enrolled
   df <- dfStudentInfo %>% drop_na(totalEnrolledTime)
   df <- filter(df, totalEnrolledTime !=0) 
@@ -477,7 +456,7 @@ I established that most of the continuous data in the complete dataset was regar
 
 To investigate I created some plots showing total steps by learner which was a count of steps completed against learner id, were giving me count of up to approximately 1500, so i chose to query the data more directly as per below.
 
-```{ r countOfStepsByLearnerByStep, echo=FALSE, out.width="100%", fig.cap="Completed Steps by Learner and Step"}
+```{r countOfStepsByLearnerByStep, echo=FALSE, out.width="100%", fig.cap="Completed Steps by Learner and Step"}
   #group by learner_id and count
   dfStepsByLearner = count(dfCompletedSteps, learner_id, step)
   arrange(dfStepsByLearner, desc(n), learner_id)
@@ -493,12 +472,19 @@ This count of steps by learner shows multiple rows of the same learner_id, i.e o
 
 As can be seen there are a lot of learners with an unfeasible amount of steps for a 3 week course with a max of 58 steps. The highest number of 183 is approximately 3 times the maximum of the course. It can also be seen that the same issue is seen in the original data, with a maximum of 304 steps, 5.2 times the maximum steps on the course. Since the issue was in the original data I concluded that I had not made any relational errors in creating my data tables, my misunderstanding was on the import from the source files into R in my munge process.
 
-The original data had been provided in 7 data files where the number had been provided in the filename. Given that this was more than the 5 times of some data for some students i hadn't expected see i decided to investigate whether i had multiple enrollments across files. For want of a better phrase I had added that value into the source data table as "stage_id", and then has used it no further. 
+The original data had been provided in 7 data files where the number had been provided in the file name. Given that this was more than the 5 times of some data for some students i hadn't expected see i decided to investigate whether i had multiple enrollments across files. For want of a better phrase I had added that value into the source data table as "stage_id", and then has used it no further. 
 
 To explore this the stage_id was added to munge step for both the enrollment data and the step data. I then visualised completed steps and enrollment against the stage id.
 
-```{r countOfStepsByLearner, echo=FALSE, out.width="100%", fig.cap="Completed Steps by Learner"}
+```{r countOfEnrollmentsStage, echo=FALSE, out.width="100%", fig.cap="Enrollments against Stage"}
 
+#sort the data
+df <- dfStudentInfo %>% drop_na(totalEnrolledTime)
+df <- filter(df, totalEnrolledTime !=0) 
+df <- select(df, learner_id, enrolled_at, unenrolled_at, totalEnrolledTime, stage_id.x)
+df$totalEnrolledTime = as.double(round(df$totalEnrolledTime, digits=0))
+
+#plot the data
 ggplot(data = df, aes(x = stage_id.x)) +
   geom_bar() + 
   theme_bw() + 
@@ -506,13 +492,19 @@ ggplot(data = df, aes(x = stage_id.x)) +
   scale_fill_brewer(palette="PuBu", name="Device") +
   theme(axis.text.x = element_text(angle = 90))
 
+#view some data
 arrange(select(df, learner_id, stage_id.x), learner_id, stage_id.x)
 ```
 You can see from the figure above that there are multiple enrollments against each stage. Which possibly indicates late joiners to the course. By sorting the data by learner and stage it can also be seen that there are multiple enrollments of the same learner across all stages but not all students enrolled on each stage, this has introduced multiplicity which should have been found in the previous iteration
 
-```{r countOfStepsByLearner, echo=FALSE, out.width="100%", fig.cap="Completed Steps by Learner"}
+```{r countOfStepsByStage, echo=FALSE, out.width="100%", fig.cap="Completed Steps by Stage"}
 
-#steps against stage_id
+#sort the data
+dfCompletedSteps = filter(dfStep, isComplete==TRUE)
+dfCompletedSteps$step = as.character(dfCompletedSteps$step)
+count(dfCompletedSteps)
+
+#plot the data
 ggplot(data = dfCompletedSteps, aes(x = stage_id)) +
   geom_bar() + 
   theme_bw() + 
@@ -520,13 +512,13 @@ ggplot(data = dfCompletedSteps, aes(x = stage_id)) +
   scale_fill_brewer(palette="PuBu", name="Device") +
   theme(axis.text.x = element_text(angle = 90))
 
-
+#view some data
 arrange(select(dfCompletedSteps, learner_id, stage_id, step), learner_id, stage_id)
 
 ```
 As you can see from the figure above there is also multiple steps against each stage, and there are steps per learner per stage. This also introduces multiplicity in the visualisations.
 
-The stage_id would perhaps have been better referred to as Cohort ID, this finding would improve the dataset in any subsequent iteraton of this data exploration.
+The stage_id would perhaps have been better referred to as Cohort ID, this finding would improve the dataset in any subsequent iteration of this data exploration.
 
 ### Conclusions
 The second iteration provided a couple of potential avenues for exploration, even though it only examined half of the dataset. Particularly:
@@ -537,7 +529,7 @@ The second iteration provided a couple of potential avenues for exploration, eve
 
 3. Questions and Answers could be related to Steps and therefore Students to get greater insight on student results. 
 
-What we learned from Iteration two is that I had failed to take into account an idea of a student cohort when I imported the data. If i had asked that question earlier in the project the data would have made more sense. The range of new skills and approaches during this assignment and unit was so wide and detailed I feel like i have barely scratched the surface. However, time is against me.
+What we learned from Iteration two is that I had failed to take into account an idea of a student cohort when I imported the data. If I had asked that question earlier in the project the data would have made more sense. The range of new skills and approaches during this assignment and unit was so wide and detailed I feel like i have barely scratched the surface. However, time is against me.
 
 ### References
 Data Science Alliance, 2021, What is CRISP-DM, https://www.datascience-pm.com/crisp-dm-2/, Accessed: 26/11/2021
