@@ -1,0 +1,191 @@
+commit a43b11ca7ab55b487625edce68e2695aeeadee26
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Wed Dec 1 21:28:54 2021 +0000
+
+    Added reflective report and final version of main report
+
+commit f9f4c20ee9d393644dd9c9b1c50638258c71071b
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Wed Dec 1 20:36:42 2021 +0000
+
+    Tidy up final version first draft, printed for proof reading
+
+commit b9cb0932f8a12a35a993717d52ea6f8cdd093f07
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Wed Dec 1 19:39:15 2021 +0000
+
+    First draft of report completed
+
+commit ae988ab74c787d570153edb94bff65d9c2714039
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Tue Nov 30 23:12:14 2021 +0000
+
+    Investigation comeplete, I2 section 3 and conclusion to do, then tidy up the knit. That knitting lark clearly doesn't work
+
+commit bc156c896f90e5ef9cbcf83ea926557776a4f282
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Sun Nov 28 14:56:38 2021 +0000
+
+    Looking at continuous data
+
+commit 758c49e144effe2317aaf6b9f2932f8b3cdb5eed
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Sun Nov 28 13:22:04 2021 +0000
+
+    Started iteration 2 data exploration
+
+commit 2f224bfef5a316ea5c34bb6236f68acc982a1730
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Sun Nov 28 12:48:48 2021 +0000
+
+    Feature engineering and some graphs on Student Info, Person and Step complete. Looking for a hypothesis
+
+commit 9a1fd9ee111aa848963507aec388d45679ff8c54
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Sat Nov 27 17:16:16 2021 +0000
+
+    Iteration 1 complete
+
+commit 3dc9b9ed33ad7cb7bb32d31af8b82d146c64cc84
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Sat Nov 27 16:55:48 2021 +0000
+
+    Iteration 1 completed
+
+commit 195fa4a8f88c12778347a214d5d20364724b4993
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Fri Nov 26 23:08:54 2021 +0000
+
+    Some notes on step activity
+
+commit ff855f4a4c56e5a3a332e89249baa11a82af8e95
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Fri Nov 26 23:04:08 2021 +0000
+
+    Revisited CRISP-DM and started report from scratch. No more initial analysis to be completed and calling iteration 1 complete
+
+commit b23ccf4df892d26127cdc90737ffc737572ff2ff
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Fri Nov 26 18:44:50 2021 +0000
+
+    Iteration 1 first draft
+
+commit 857d0e84ccb5b8325fc2d90db08b3647af9b09d7
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Fri Nov 26 16:31:13 2021 +0000
+
+    Still need a rethink on visualisatons for video views
+
+commit a324aca6134c2b40c7d1041aa556d97c132576ea
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Fri Nov 26 15:39:27 2021 +0000
+
+    Iteration 1 complete to Conclusion and hypothesis
+
+commit 70426ec58806bb7b840b4622078b87b58f2aee63
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Thu Nov 25 16:41:47 2021 +0000
+
+    Iteration 1 first draft, completed narrative of each dataset, to be looked at again tomorrow
+
+commit 508537deadb233684e1737d00420688e995b6b1f
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Wed Nov 24 18:10:50 2021 +0000
+
+    Sentiment graphs complete, ready to write narrative for i#1
+
+commit 61cb81fcf97571959dcbd74fdb53c11ac7038e96
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Tue Nov 23 19:28:18 2021 +0000
+
+    Added latest reports to markdown
+
+commit 6a94c03e82e0deeeed777398d37ed833d91033f6
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Tue Nov 23 19:24:25 2021 +0000
+
+    Completed visualisation of videos
+
+commit db234cb604a9d47871e75c51814d9d0239919a19
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Tue Nov 23 15:47:16 2021 +0000
+
+    Question response graphs complete
+
+commit 70ff114c109c5eb36a653f3aa980b5376b4d74a9
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Fri Nov 19 16:35:55 2021 +0000
+
+    Data munging for leavers and question responses, analysis of both
+
+commit 3d4633b97b7fd6855c62ba74a0a0d31208e78768
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Fri Nov 19 13:44:28 2021 +0000
+
+    Analysis of initial datasets and writing iteration 1 report
+
+commit 6b161c55def4b05e4c1ee1f97d2cb6f8ab05bd22
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Thu Nov 18 15:59:59 2021 +0000
+
+    Investigating enrollments
+
+commit 293687e50a8cd7de8ebf02e64223c9e32119a874
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Thu Nov 18 13:14:34 2021 +0000
+
+    Initial investigation into enrollments, set up markdown properly, tidied report
+
+commit 84887a11fdb339e48cc63619e9dc263818394763
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Wed Nov 17 16:49:17 2021 +0000
+
+    Added a stageid to indicate which file the data came from, added primary keys but not sure if i need them, started with simple barcharts to look at enrollments, results and leavers
+
+commit d8b72d0f2c4b99f3c63c185a50c75e5d619a793a
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Wed Nov 17 15:05:23 2021 +0000
+
+    Adding unit_id to identify run
+
+commit 0e32ffec9fe9a3563ed06f70aefcc755c10d520c
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Wed Nov 17 12:05:53 2021 +0000
+
+    Munge updated to set df column types, started report
+
+commit 3c29605497d2640e398b50af2686c8314459904c
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Thu Nov 11 21:41:50 2021 +0000
+
+    Fixed sentiment survery dataframe type issues
+
+commit 78df981737f0d8ba0898130015dbbe99c3b7b778
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Thu Nov 11 21:32:02 2021 +0000
+
+    Munge to load data from all files completed
+
+commit 623790eddfc73c975967f6330faebc51b7baa379
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Thu Nov 11 18:41:49 2021 +0000
+
+    Made a start
+
+commit 651ea80b949e6fcdfb90a924b2ee44c614318e1e
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Sun Nov 7 15:28:32 2021 +0000
+
+    Resolved markdown issue, ignoring cache directory
+
+commit b20d9fe613cfa4653c57a19ed9735d1cdd2885f4
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Sun Nov 7 13:55:32 2021 +0000
+
+    Imported data, markdown not working yet
+
+commit 276485d0da3841a63cc86c3fc0bed9c256c4fbbb
+Author: “Marc <m.birkett2@newcastle.ac.uk>
+Date:   Sun Nov 7 13:18:32 2021 +0000
+
+    Initial commit
